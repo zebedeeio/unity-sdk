@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29411.108
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ZbdUnitySDK", "ZbdUnitySDK\ZbdUnitySDK.csproj", "{A3589EB8-7B78-4738-9361-E13D801A399E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZbdUnitySDKTest", "ZbdUnitySDKTest\ZbdUnitySDKTest.csproj", "{D6E9790B-85C2-4695-9A6E-4247A9E56736}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{A3589EB8-7B78-4738-9361-E13D801A399E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A3589EB8-7B78-4738-9361-E13D801A399E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A3589EB8-7B78-4738-9361-E13D801A399E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A3589EB8-7B78-4738-9361-E13D801A399E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D6E9790B-85C2-4695-9A6E-4247A9E56736}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D6E9790B-85C2-4695-9A6E-4247A9E56736}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D6E9790B-85C2-4695-9A6E-4247A9E56736}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D6E9790B-85C2-4695-9A6E-4247A9E56736}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {4C1CCFAE-3DDC-4084-A3A0-0A28372D877F}
+	EndGlobalSection
+EndGlobal
