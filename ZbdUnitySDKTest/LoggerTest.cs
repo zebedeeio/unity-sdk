@@ -1,34 +1,37 @@
-﻿using System;
+﻿using BTCPayServer.Lightning;
+using NBitcoin;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
+using System.Threading.Tasks;
 using Xunit;
 using Xunit.Abstractions;
+using ZbdUnitySDK.Logging;
 
 namespace ZbdUnitySDKTest
 {
     public class LoggerTest
     {
-        //private readonly ITestOutputHelper output;
+        private readonly ITestOutputHelper output;
 
-        //public LoggerTest(ITestOutputHelper testOutputHelper)
-        //{
-        //    this.output = testOutputHelper;
-        //}
+        public LoggerTest(ITestOutputHelper testOutputHelper)
+        {
+            this.output = testOutputHelper;
+        }
 
 
-        //[Fact]
-        //public void Write_Log_Test()
-        //{
-        //    ILogger logger = new Log4NetLogger();
+        [Fact]
+        public void Write_Log_Test()
+        {
+            ILogger logger = LoggerManager.GetLogger(LogType.LOG4NET, this.GetType());
 
-        //    logger.Log(LogEntryType.Info, "Test LOG!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+            logger.Info("Test LOG!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+            logger.Debug("Test LOG!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
 
-        //    output.WriteLine("TEST DONE");
+            output.WriteLine("TEST DONE from helper1");
 
-        //    Console.WriteLine("Console TEST DONE");
-        //    Trace.WriteLine("Trace TEST DONE");
-        //}
+        }
 
 
     }

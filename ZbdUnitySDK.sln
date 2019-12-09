@@ -5,7 +5,7 @@ VisualStudioVersion = 16.0.29411.108
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ZbdUnitySDK", "ZbdUnitySDK\ZbdUnitySDK.csproj", "{A3589EB8-7B78-4738-9361-E13D801A399E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZbdUnitySDKTest", "ZbdUnitySDKTest\ZbdUnitySDKTest.csproj", "{D6E9790B-85C2-4695-9A6E-4247A9E56736}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ZbdUnitySDKTest", "ZbdUnitySDKTest\ZbdUnitySDKTest.csproj", "{D6E9790B-85C2-4695-9A6E-4247A9E56736}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

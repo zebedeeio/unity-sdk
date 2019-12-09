@@ -2,6 +2,16 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <RootNamespace>ZbdUnitySDK</RootNamespace>
+    <AssemblyName>ZebedeeUnitySDK</AssemblyName>
+    <ApplicationIcon />
+    <Win32Resource />
+    <OutputType>Exe</OutputType>
+    <StartupObject />
+    <Authors>Zebedee Inc.</Authors>
+    <Product>Zebedee Unity SDK</Product>
+    <Description>Unity SDK for Linghing Network</Description>
+    <Copyright>Zebedee Inc.</Copyright>
   </PropertyGroup>
 
   <ItemGroup>
@@ -13,7 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="log4net" Version="2.0.8" />
+    <PackageReference Include="BTCPayServer.Lightning.All" Version="1.1.5" />
     <PackageReference Include="Multiformats.Base" Version="2.0.1" />
     <PackageReference Include="NBitcoin" Version="5.0.6" />
     <PackageReference Include="Portable.BouncyCastle" Version="1.8.5.2" />
@@ -24,6 +34,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Reference Include="log4net">
+      <HintPath>..\DependencyDlls\log4net.dll</HintPath>
+    </Reference>
     <Reference Include="UnityEngine">
       <HintPath>C:\Program Files\Unity\Hub\Editor\2019.2.9f1\Editor\Data\Managed\UnityEngine.dll</HintPath>
     </Reference>
@@ -37,7 +50,21 @@
 
   <ItemGroup>
     <Folder Include="Clients\" />
-    <Folder Include="Logging\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Properties\Resources.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
   </ItemGroup>
 
 </Project>

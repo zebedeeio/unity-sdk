@@ -1,20 +1,30 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using ZbdUnitySDK.models;
-
-namespace ZbdUnitySDK.Services
+﻿namespace ZbdUnitySDK.Services
 {
-    class LndLnService : ILnService
+    using System;
+    using System.Threading.Tasks;
+    using BTCPayServer.Lightning;
+    using ZbdUnitySDK.models;
+
+    public class LndLnService
     {
-        Invoice ILnService.createInvoice()
+        private string lndUrl = null;
+        private string macaroon = null;
+        public LndLnService(string lndUrl,string macaroon)
         {
-            throw new NotImplementedException();
+            this.lndUrl = lndUrl;
+            this.macaroon = macaroon;
         }
 
-        Invoice ILnService.subscribePayment()
+        public async Task CreateLndInvoice(InvoiceRequest invoiceReq, Action<LightningInvoice> invoiceAction)
         {
-            throw new NotImplementedException();
+            //https://btcpay-test.zebedee.dev/lnd-rest/btc/;macaroon=223423423sdfs
+            string connectionString = "type=lnd-rest;server="+lndUrl+";macaroon="+macaroon;
+            ILightningClientFactory factory = new LightningClientFactory(NBitcoin.Network.Main);
+            ILightningClient client = factory.Create(connectionString);
+            LightningInvoice lightningInvoice = await client.CreateInvoice(new LightMoney(invoiceReq.MilliSatoshiAmount, LightMoneyUnit.Satoshi), invoiceReq.Description, TimeSpan.FromMinutes(invoiceReq.ExpiryMin));
+            invoiceAction(lightningInvoice);
+            return;
         }
+
     }
 }
