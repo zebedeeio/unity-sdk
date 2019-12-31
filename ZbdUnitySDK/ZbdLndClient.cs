@@ -7,13 +7,13 @@
     using ZbdUnitySDK.models;
     using ZbdUnitySDK.Services;
 
-    public class UnityLndClient
+    public class ZbdLndClient
     {
         private LndLnService lndLnService;
         private MonoBehaviour owner = null;
         private string baseUrl;
 
-        public UnityLndClient(MonoBehaviour owner, string baseUrl,string macaroon)
+        public ZbdLndClient(MonoBehaviour owner, string baseUrl,string macaroon)
         {
             this.owner = owner;
             this.baseUrl = baseUrl;

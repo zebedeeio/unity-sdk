@@ -9,7 +9,7 @@
         BTCPAY,LND,ZEDEBEE,
     }
 
-    public interface ZbdClient
+    public interface IZebedeeClient
     {
         //Authenticate by specified backend
         void initalize();

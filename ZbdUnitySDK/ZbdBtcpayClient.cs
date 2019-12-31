@@ -4,41 +4,31 @@
     using System.Collections;
     using NBitcoin;
     using UnityEngine;
- 
-    using ZbdUnitySDK.models;
+    using ZbdUnitySDK.Exception;
     using ZbdUnitySDK.Models.BTCPay;
     using ZbdUnitySDK.Services;
     using ZbdUnitySDK.UnityUtils;
     using ZbdUnitySDK.Utils;
- 
-    public class UnityBtcpayClient
+
+    public class ZbdBtcpayClient
     {
         private Key ecKey = null;
         private string identity = null;
         private IResourceDataAccess resourceDataAccess;
         private BtcPayLnService btcPayLnService;
+        private bool isInitialized = false;
 
-
-        public Invoice CreateInvoice()
-        {
-            throw new NotImplementedException();
-        }
-
-        public Texture2D GenerateQR(string boltPayReq)
-        {
-            throw new NotImplementedException();
-        }
-
-
-        public IEnumerator Intitalize(MonoBehaviour mono, string pairCode,string btcpayServerHost)
+        public ZbdBtcpayClient(MonoBehaviour mono, string pairCode, string btcpayServerHost)
         {
             this.resourceDataAccess = new FileResourceDataAccess();
             this.InitKeys();
             this.DeriveIdentity();
- 
-            this.btcPayLnService = new BtcPayLnService(mono,btcpayServerHost,this.ecKey,this.identity,pairCode);
+            this.btcPayLnService = new BtcPayLnService(mono, btcpayServerHost, this.ecKey, this.identity, pairCode);
+        }
+        public IEnumerator Intitalize()
+        {
             yield return this.btcPayLnService.GetAccessTokens();
-
+            this.isInitialized = true;
         }
 
 
@@ -49,6 +39,11 @@
         /// <returns>A new invoice object returned from the server.</returns>
         public IEnumerator CreateInvoice(InvoiceBtcpay invoice, Action<InvoiceBtcpay> invoiceAction)
         {
+            if (!this.isInitialized)
+            {
+                throw new BitPayException("Client is not initialized");
+            }
+
             if (invoiceAction is null)
             {
                 throw new ArgumentNullException(nameof(invoiceAction));
@@ -59,6 +54,8 @@
             return btcPayLnService.CreateInvoice(invoice, invoiceAction);
 
         }
+
+
 
         /////////////////private methods///////////////////
         private void InitKeys()
@@ -84,8 +81,6 @@
             // Identity in this implementation is defined to be the Bitpay SIN.
             this.identity = KeyUtils.DeriveSIN(this.ecKey);
         }
-
-
 
     }
 }

@@ -4,7 +4,7 @@ using ZbdUnitySDK.Utils;
 
 namespace ZbdUnitySDKTest
 {
-    public class UtilsTest
+    public class UtilTest
     {
         [Fact]
         public void File_Access_Read_Write_Test()
