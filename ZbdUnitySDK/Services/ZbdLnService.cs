@@ -5,7 +5,6 @@
     using System.Text;
     using System.Threading.Tasks;
     using Newtonsoft.Json;
-    using UnityEngine;
     using ZbdUnitySDK.Models.Zebedee;
 
     public class ZbdLnService
@@ -38,12 +37,12 @@
 
                 StringContent httpContent = new StringContent(bodyJson, Encoding.UTF8, "application/json");
                 httpContent.Headers.Add("apikey", zebedeeAuth);
-                Debug.Log(zebedeeUrl + "charges");
-                Debug.Log("bodyJson:" + bodyJson);
+                Console.WriteLine(zebedeeUrl + "charges");
+                Console.WriteLine("bodyJson:" + bodyJson);
                 HttpResponseMessage response = await Client.PostAsync(zebedeeUrl + "charges",httpContent);
                 response.EnsureSuccessStatusCode();
                 string responseBody = await response.Content.ReadAsStringAsync();
-                Debug.Log(responseBody);
+                Console.WriteLine(responseBody);
 
                 //Deserialize
                 Charge deserializedCharge = JsonConvert.DeserializeObject<Charge>(responseBody, jsonSettings);
@@ -91,27 +90,28 @@
             throw new NotImplementedException();
         }
 
-        public async Task WithDrawAsync(PaymentRequest paymentRequest, Action<PaymentResponse> paymentction)
+        public async Task WithdrawAsync(WithdrawRequest withdrawRequest, Action<WithdrawResponse> withdrawAction)
         {
             try
             {
-                string json = JsonConvert.SerializeObject(paymentRequest, jsonSettings);
-
+                string json = JsonConvert.SerializeObject(withdrawRequest, jsonSettings);
+                Console.WriteLine("Withdraw request:" + json);
                 StringContent httpContent = new StringContent(json, Encoding.UTF8, "application/json");
                 httpContent.Headers.Add("apikey", this.zebedeeAuth);
-                HttpResponseMessage response = await Client.PostAsync(this.zebedeeUrl + "payments", httpContent);
+                HttpResponseMessage response = await Client.PostAsync(this.zebedeeUrl + "withdrawal-requests-fetch", httpContent);
                 response.EnsureSuccessStatusCode();
                 string responseBody = await response.Content.ReadAsStringAsync();
+                Console.WriteLine("Withdraw response:" + responseBody);
+
                 //Deserialize
-                PaymentResponse deserializedCharge = JsonConvert.DeserializeObject<PaymentResponse>(responseBody, jsonSettings);
+                WithdrawResponse deserializedCharge = JsonConvert.DeserializeObject<WithdrawResponse>(responseBody, jsonSettings);
 
-
-                paymentction(deserializedCharge);
+                withdrawAction(deserializedCharge);
 
             }
             catch (HttpRequestException e)
             {
-                Console.WriteLine("Message :{0} ", e.Message);
+                Console.WriteLine("Withdrawal with Exception :" + e);
                 throw e;
             }
 

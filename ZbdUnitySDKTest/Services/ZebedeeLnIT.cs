@@ -12,9 +12,8 @@ namespace ZbdUnitySDKTest
     {
 
         private readonly ITestOutputHelper output;
-        private readonly string zebedeeUrl = "http://kong-stag.zebedee.cloud:8000/v0/";
-        private readonly string apikey = "y7hd1AQ9GO6VO0TaLOt3Bza2c0PSm0zk";
-
+        private readonly string zebedeeUrl = "http://kong-qa.zebedee.cloud:8000/v0/";
+        private readonly string apikey = "SEJYoxe7oSM6f3UMfhMNRgd5rz2UHEWE";
 
         public ZebedeeLnIT(ITestOutputHelper testOutputHelper)
         {
@@ -22,12 +21,13 @@ namespace ZbdUnitySDKTest
         }
 
         [Fact]
-        public async void SimpleInvoiceCreationTest()
+        public async void InvoiceCreationAndPaymentTest()
         {
             string testDesc = "TEST DESCRIPTION";
 
             //service setup
             ZbdLnService zbdLnService = new ZbdLnService(zebedeeUrl, apikey );
+
             ///////////////////////////// Create Invoice
             ChargeData chargeData = new ChargeData();
             chargeData.Name = testDesc;
@@ -37,7 +37,7 @@ namespace ZbdUnitySDKTest
             //Countdown Latch
             CountdownEvent cde = new CountdownEvent(1); // initial count = 1
             String bolt = "";
-            //Call the API 
+            //Call the API and assert within the callback
             Task task = zbdLnService.createInvoiceAsync(chargeData, charge =>
             {
                 try
@@ -49,6 +49,7 @@ namespace ZbdUnitySDKTest
                     Assert.StartsWith("lnbc10n1", charge.Data.Invoice.Request);
                     output.WriteLine("in action bolt:" + charge.Data.Invoice.Request);
                     output.WriteLine("in action amount:" + charge.Data.Amount);
+                    //Memo BOLT11 for payment
                     bolt = charge.Data.Invoice.Request;
                 }
                 finally
@@ -56,9 +57,10 @@ namespace ZbdUnitySDKTest
                     cde.Signal();
                 }
             });
+            await task;
 
             //Latch wait
-            cde.Wait(5000);
+            cde.Wait(3000);
             if(cde.CurrentCount != 0)
             {
                 Assert.True(false,"charge call timeout ");
@@ -100,9 +102,54 @@ namespace ZbdUnitySDKTest
             {
                 Assert.True(false, "payment call timeout ");
             }
+        }
 
+        //WithdrawAsync
+
+        [Fact]
+        public async void WithdrawalTest()
+        {
+            string testDesc = "TEST DESCRIPTION";
+
+            //service setup
+            ZbdLnService zbdLnService = new ZbdLnService(zebedeeUrl, apikey);
+
+            ///////////////////////////// Create Invoice
+            WithdrawRequest request = new WithdrawRequest();
+
+            request.Description = testDesc;
+            request.Amount = 1000;
+            request.InternalId = "IntegTest-Withdrawal" + DateTime.Now.ToString();
+
+            //Countdown Latch
+            CountdownEvent cde = new CountdownEvent(1); // initial count = 1
+            //Call the API and assert within the callback
+            Task task = zbdLnService.WithdrawAsync(request, withdrawResponse =>
+            {
+                try
+                {
+                    Assert.NotNull(withdrawResponse.URL);
+                    Assert.NotNull(withdrawResponse.Lnurl);
+                    Assert.StartsWith("http", withdrawResponse.URL);
+                    Assert.StartsWith("lnurl", withdrawResponse.Lnurl);
+
+                    output.WriteLine("in action url:" + withdrawResponse.URL);
+                    output.WriteLine("in action lnurl:" + withdrawResponse.Lnurl);
+                }
+                finally
+                {
+                    cde.Signal();
+                }
+            });
+
+            //Latch wait
+            cde.Wait(5000);
+            if (cde.CurrentCount != 0)
+            {
+                Assert.True(false, "charge call timeout ");
+            }
+        }
 
 
         }
     }
-}
