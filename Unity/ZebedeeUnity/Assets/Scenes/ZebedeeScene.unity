@@ -223,8 +223,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -153, y: 93}
-  m_SizeDelta: {x: 254, y: 30}
+  m_AnchoredPosition: {x: -52.7, y: 109.42}
+  m_SizeDelta: {x: 200.6, y: 33.2}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &244218348
 MonoBehaviour:
@@ -354,11 +354,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c970684804ce3f043bf1e093c3c1e0ea, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  apiKey: SEJYoxe7oSM6f3UMfhMNRgd5rz2UHEWE
+  apiKey: I7ifHpPJgU3h7Ewmu6gczrJayJmCIqrb
   zebedeeBaseUrl: http://kong-qa.zebedee.cloud:8000/v0/
   product: {fileID: 2096148998}
   amount: {fileID: 629152070}
-  QRcode: {fileID: 1182835226}
+  QRcodeBOLT11: {fileID: 1182835226}
+  QRcodeLnURL: {fileID: 1511054715}
 --- !u!4 &288372993
 Transform:
   m_ObjectHideFlags: 0
@@ -456,7 +457,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 288372992}
-        m_MethodName: CreateInvoice
+        m_MethodName: CreateWithdrawal
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -641,7 +642,7 @@ MonoBehaviour:
     m_BestFit: 0
     m_MinSize: 10
     m_MaxSize: 40
-    m_Alignment: 0
+    m_Alignment: 2
     m_AlignByGeometry: 0
     m_RichText: 0
     m_HorizontalOverflow: 1
@@ -880,7 +881,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Enter text...
+  m_Text: Enter Amount in satoshi...
 --- !u!222 &1364954682
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -999,8 +1000,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -153, y: 171}
-  m_SizeDelta: {x: 254, y: 30}
+  m_AnchoredPosition: {x: -48.2, y: 175.3}
+  m_SizeDelta: {x: 209.7, y: 31.3}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1583127996
 MonoBehaviour:
@@ -1169,7 +1170,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: WithDraw
+  m_Text: WithDraw my Sats
 --- !u!222 &1610112291
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -1311,7 +1312,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -309, y: 171}
+  m_AnchoredPosition: {x: -216, y: 176}
   m_SizeDelta: {x: 60, y: 20}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1779357070
@@ -1469,8 +1470,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -309, y: 91}
-  m_SizeDelta: {x: 60, y: 20}
+  m_AnchoredPosition: {x: -216, y: 111}
+  m_SizeDelta: {x: 74.3, y: 36.3}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1947361291
 MonoBehaviour:
@@ -1503,7 +1504,9 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Amount
+  m_Text: 'Amount
+
+    (in satoshi)'
 --- !u!222 &1947361292
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -1786,7 +1789,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Enter text...
+  m_Text: Enter Game Item Name...
 --- !u!222 &2144809464
 CanvasRenderer:
   m_ObjectHideFlags: 0

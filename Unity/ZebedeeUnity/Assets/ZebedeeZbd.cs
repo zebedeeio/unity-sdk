@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using ZbdUnitySDK;
 using ZbdUnitySDK.models;
+using ZbdUnitySDK.Models.Zebedee;
 using ZXing;
 using ZXing.QrCode;
 
@@ -13,7 +14,8 @@ public class ZebedeeZbd : MonoBehaviour
 
     public Text product;
     public Text amount;
-    public GameObject QRcode;
+    public GameObject QRcodeBOLT11;
+    public GameObject QRcodeLnURL;
 
     private ZebedeeClient zbdClient = null;
 
@@ -50,7 +52,7 @@ public class ZebedeeZbd : MonoBehaviour
 
         //4.Set the QR code iamge to image Gameobject
         //4.取得したBOLTからQRコードを作成し、ウオレットでスキャンするために表示する。
-        QRcode.GetComponent<Image>().sprite = Sprite.Create(texs, new Rect(0.0f, 0.0f, texs.width, texs.height), new Vector2(0.5f, 0.5f), 100.0f);
+        QRcodeBOLT11.GetComponent<Image>().sprite = Sprite.Create(texs, new Rect(0.0f, 0.0f, texs.width, texs.height), new Vector2(0.5f, 0.5f), 100.0f);
 
         //5.Subscribe the an callback method with invoice ID to be monitored
         //5.支払がされたら実行されるコールバックを引き渡して、コールーチンで実行する
@@ -60,7 +62,7 @@ public class ZebedeeZbd : MonoBehaviour
 
     }
 
-     
+
     ////Callback method when payment is executed. 
     ////支払実行時に、呼び出されるコールバック 関数（最新のインボイスオブジェクトが渡される）
     //public void printInvoice(Invoice invoice)
@@ -81,6 +83,46 @@ public class ZebedeeZbd : MonoBehaviour
     //    }
 
     //}
+
+
+    public async void CreateWithdrawal()
+    {
+        //1.New Invoice Preparation
+        //1.インボイス オブジェクトに必要項目をセットする
+        WithdrawRequest withdrawReq = new WithdrawRequest();
+        withdrawReq.Description = product.text;
+        withdrawReq.Amount = int.Parse(amount.text);
+        withdrawReq.InternalId = product.text;
+
+        //2.Create Invoice with initial data and get the full invoice
+        //2.Zebedee Serverにインボイスデータをサブミットして、インボイスの詳細データを取得する。
+        await zbdClient.WithDrawAsync(withdrawReq, handleWithdrawal);
+
+    }
+
+    private void handleWithdrawal(WithdrawResponse withdraw)
+    {
+        string lnURL = withdraw.Data.Lnurl;
+        if (string.IsNullOrEmpty(lnURL))
+        {
+            Debug.Log("lnURL is not set in withdrawal response.");
+            Debug.Log(withdraw.Data.Lnurl);
+            return;
+        }
+
+        Texture2D texs = GenerateQR(lnURL);//Generate QR code image
+
+        //4.Set the QR code iamge to image Gameobject
+        //4.取得したBOLTからQRコードを作成し、ウオレットでスキャンするために表示する。
+        QRcodeLnURL.GetComponent<Image>().sprite = Sprite.Create(texs, new Rect(0.0f, 0.0f, texs.width, texs.height), new Vector2(0.5f, 0.5f), 100.0f);
+
+        //5.Subscribe the an callback method with invoice ID to be monitored
+        //5.支払がされたら実行されるコールバックを引き渡して、コールーチンで実行する
+        //        StartCoroutine(btcPayClient.SubscribeInvoiceCoroutine(invoice.Id, printInvoice));
+        //StartCoroutine(btcPayClient.listenInvoice(invoice.Id, printInvoice));
+
+
+    }
 
 
     private Texture2D GenerateQR(string text)

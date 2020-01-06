@@ -5,7 +5,7 @@
     public class WithdrawRequest
     {
         [JsonProperty(PropertyName = "amount")]
-        public int Amount { get; set; }
+        public long Amount { get; set; }
 
         [JsonProperty(PropertyName = "internalId")]
         public string InternalId { get; set; }
@@ -16,10 +16,22 @@
 
     public class WithdrawResponse
     {
-        public string URL { get; set; }
+        public string Message { get; set; }
+
+        public WithdrawData Data { get; set; }
+    }
+    public class WithdrawData
+    {
+        public string Id { get; set; }
+        public int Fee { get; set; }
 
         public string Lnurl { get; set; }
 
+        public long Amount { get; set; }
+
+        public string Status { get; set; }
+        public string InternalId { get; set; }
+        public string Description { get; set; }
     }
 
 }

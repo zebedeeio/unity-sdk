@@ -35,10 +35,23 @@
         public async Task PayInvoiceAsync(string bolt11)
         {
             PaymentRequest paymentRequest = new PaymentRequest();
+
             paymentRequest.Invoice = bolt11;
 
             await zbdService.payInvoiceAsync(paymentRequest, paymentResponse => {
                 Debug.Log(paymentResponse.Data.Status);
+            });
+
+        }
+
+        public async Task WithDrawAsync(WithdrawRequest withdrawRequest, Action<WithdrawResponse> action)
+        {
+
+            //Satoshi to milli satoshi
+            withdrawRequest.Amount = withdrawRequest.Amount * 1000;
+
+            await zbdService.WithdrawAsync(withdrawRequest, paymentResponse => {
+                action(paymentResponse);
             });
 
         }

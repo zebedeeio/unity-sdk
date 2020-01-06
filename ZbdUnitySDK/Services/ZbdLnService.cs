@@ -85,7 +85,7 @@
 
         }
 
-        public models.Invoice subscribePayment()
+        public models.Invoice subscribePayment(string invoiceUUid)
         {
             throw new NotImplementedException();
         }
@@ -98,7 +98,7 @@
                 Console.WriteLine("Withdraw request:" + json);
                 StringContent httpContent = new StringContent(json, Encoding.UTF8, "application/json");
                 httpContent.Headers.Add("apikey", this.zebedeeAuth);
-                HttpResponseMessage response = await Client.PostAsync(this.zebedeeUrl + "withdrawal-requests-fetch", httpContent);
+                HttpResponseMessage response = await Client.PostAsync(this.zebedeeUrl + "withdrawal-requests-create", httpContent);
                 response.EnsureSuccessStatusCode();
                 string responseBody = await response.Content.ReadAsStringAsync();
                 Console.WriteLine("Withdraw response:" + responseBody);
