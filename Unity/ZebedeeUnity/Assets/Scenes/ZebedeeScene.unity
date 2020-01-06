@@ -571,7 +571,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Pay for Game
+  m_Text: Pay for Game Item
 --- !u!222 &586551207
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -1170,7 +1170,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: WithDraw my Sats
+  m_Text: Withdraw my Sats
 --- !u!222 &1610112291
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -1312,8 +1312,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -216, y: 176}
-  m_SizeDelta: {x: 60, y: 20}
+  m_AnchoredPosition: {x: -207.5, y: 176.7}
+  m_SizeDelta: {x: 77, y: 18.7}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1779357070
 MonoBehaviour:
@@ -1346,7 +1346,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Item
+  m_Text: Description
 --- !u!222 &1779357071
 CanvasRenderer:
   m_ObjectHideFlags: 0
