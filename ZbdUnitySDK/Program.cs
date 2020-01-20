@@ -1,10 +1,7 @@
-﻿using BTCPayServer.Lightning;
-using NBitcoin;
-using System;
-using ZbdUnitySDK.Logging;
-
-namespace MainRunner
+﻿namespace MainRunner
 {
+    using ZbdUnitySDK.Logging;
+
     class Program
     {
 

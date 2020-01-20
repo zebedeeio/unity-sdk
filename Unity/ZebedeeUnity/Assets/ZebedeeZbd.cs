@@ -1,4 +1,4 @@
-﻿using BTCPayServer.Lightning;
+﻿
 using UnityEngine;
 using UnityEngine.UI;
 using ZbdUnitySDK;
@@ -38,10 +38,11 @@ public class ZebedeeZbd : MonoBehaviour
 
     }
 
-    private void handleInvoice(LightningInvoice invoice)
+    private async void handleInvoice(ChargeDetail invoice)
     {
         //3.Lightning BOLT invoice string
-        string boltInvoice = invoice.BOLT11;
+        string boltInvoice = invoice.Data.Invoice.Request;
+        string chargeId = invoice.Data.Id;
         if (string.IsNullOrEmpty(boltInvoice))
         {
             Debug.Log("bolt Invoice is not set in Invoice in reponse.Check the BTCpay server's lightning setup");
@@ -58,32 +59,22 @@ public class ZebedeeZbd : MonoBehaviour
         //5.支払がされたら実行されるコールバックを引き渡して、コールーチンで実行する
         //        StartCoroutine(btcPayClient.SubscribeInvoiceCoroutine(invoice.Id, printInvoice));
         //StartCoroutine(btcPayClient.listenInvoice(invoice.Id, printInvoice));
+        string status = await zbdClient.SubscribeChargeAsync(chargeId);
 
-
+        if ("completed".Equals(status))
+        {
+            //インボイスのステータスがcompleteであれば、全額が支払われた状態なので、支払完了のイメージに変更する
+            //Change the image from QR to Paid
+            QRcodeBOLT11.GetComponent<Image>().sprite = Resources.Load<Sprite>("image/paid");
+            Debug.Log("payment is complete");
+        }
+        else
+        {
+            //for example, if the amount paid is not full, do something.the line below just print the status.
+            //全額支払いでない場合には、なにか処理をおこなう。以下は、ただ　ステータスを表示して終了。
+            Debug.Log("payment is not completed:" +status);
+        }
     }
-
-
-    ////Callback method when payment is executed. 
-    ////支払実行時に、呼び出されるコールバック 関数（最新のインボイスオブジェクトが渡される）
-    //public void printInvoice(Invoice invoice)
-    //{
-    //    //Hide QR code image to Paied Image file
-    //    //ステータス 一覧はこちら。 https://bitpay.com/docs/invoice-states
-    //    if (invoice.Status == "complete")
-    //    {
-    //        //インボイスのステータスがcompleteであれば、全額が支払われた状態なので、支払完了のイメージに変更する
-    //        //Change the image from QR to Paid
-    //        QRcode.GetComponent<Image>().sprite = Resources.Load<Sprite>("image/paid");
-    //        Debug.Log("payment is complete");
-    //    }else
-    //    {
-    //         //for example, if the amount paid is not full, do something.the line below just print the status.
-    //        //全額支払いでない場合には、なにか処理をおこなう。以下は、ただ　ステータスを表示して終了。
-    //        Debug.Log("payment is not completed:" + invoice.Status);
-    //    }
-
-    //}
-
 
     public async void CreateWithdrawal()
     {
@@ -100,7 +91,7 @@ public class ZebedeeZbd : MonoBehaviour
 
     }
 
-    private void handleWithdrawal(WithdrawResponse withdraw)
+    private async void handleWithdrawal(WithdrawResponse withdraw)
     {
         string lnURL = withdraw.Data.Lnurl;
         if (string.IsNullOrEmpty(lnURL))
@@ -120,7 +111,21 @@ public class ZebedeeZbd : MonoBehaviour
         //5.支払がされたら実行されるコールバックを引き渡して、コールーチンで実行する
         //        StartCoroutine(btcPayClient.SubscribeInvoiceCoroutine(invoice.Id, printInvoice));
         //StartCoroutine(btcPayClient.listenInvoice(invoice.Id, printInvoice));
+        string status = await zbdClient.SubscribeWithDrawAsync(withdraw.Data.Id);
 
+        if ("success".Equals(status))
+        {
+            //インボイスのステータスがcompleteであれば、全額が支払われた状態なので、支払完了のイメージに変更する
+            //Change the image from QR to Paid
+            QRcodeLnURL.GetComponent<Image>().sprite = Resources.Load<Sprite>("image/withdrawn");
+            Debug.Log("withdraw is success");
+        }
+        else
+        {
+            //for example, if the amount paid is not full, do something.the line below just print the status.
+            //全額支払いでない場合には、なにか処理をおこなう。以下は、ただ　ステータスを表示して終了。
+            Debug.Log("withdraw is not success:" + status);
+        }
 
     }
 

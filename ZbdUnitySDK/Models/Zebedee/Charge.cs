@@ -25,12 +25,18 @@ namespace ZbdUnitySDK.Models.Zebedee
 */
 
 
-    public class Charge
+    public class ChargeDetail
+
     {
 
         public string Message { get; set; }
 
         public ChargeData Data { get; set; }
+
+        public override string ToString()
+        {
+            return "ChargeDetail: " + Message + " " + Data.ToString();
+        }
     }
 
    public  class ChargeData
@@ -52,6 +58,12 @@ namespace ZbdUnitySDK.Models.Zebedee
         public string Status { get; set; }
 
         public Invoice Invoice { get; set; }
+
+        public override string ToString()
+        {
+            return "ChargeData: " + Name + " " + Description + " " + Amount + " "+ Status;
+        }
+
     }
 
     public class Invoice

@@ -27,7 +27,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="BTCPayServer.Lightning.All" Version="1.1.5" />
     <PackageReference Include="Multiformats.Base" Version="2.0.1" />
     <PackageReference Include="NBitcoin" Version="5.0.6" />
     <PackageReference Include="Portable.BouncyCastle" Version="1.8.5.2" />
@@ -50,10 +49,6 @@
     <None Update="log4net.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Clients\" />
   </ItemGroup>
 
   <ItemGroup>

@@ -25,7 +25,7 @@ namespace ZbdUnitySDKTest
             string testMessage = "TEST MESSAGE";
             string testPaymentName = "Purchased game item #MASA001";
 
-            Charge charge = new Charge();
+            ChargeDetail charge = new ChargeDetail();
             charge.Message = testMessage ;
             ChargeData data = new ChargeData();
             data.Name = testPaymentName;
@@ -35,7 +35,7 @@ namespace ZbdUnitySDKTest
             Assert.Contains(testMessage, output);
 
             //Deserialize
-            Charge deserializedCharge = JsonConvert.DeserializeObject<Charge>(output);
+            ChargeDetail deserializedCharge = JsonConvert.DeserializeObject<ChargeDetail>(output);
             Assert.NotNull(deserializedCharge.Data);
             Assert.Equal(deserializedCharge.Data.Name,testPaymentName);
 
@@ -69,7 +69,7 @@ namespace ZbdUnitySDKTest
             jsonSettings.DateTimeZoneHandling = DateTimeZoneHandling.Local;
 
             //Deserialize
-            Charge deserializedCharge = JsonConvert.DeserializeObject<Charge>(testJson,jsonSettings);
+            ChargeDetail deserializedCharge = JsonConvert.DeserializeObject<ChargeDetail>(testJson,jsonSettings);
             //1st level
             Assert.Equal("Successfully retrieved Charge.", deserializedCharge.Message);
             Assert.NotNull(deserializedCharge.Data);

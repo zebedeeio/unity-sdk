@@ -14,7 +14,7 @@ namespace ZbdUnitySDKTest
 
         private readonly ITestOutputHelper output;
         private readonly string zebedeeUrl = "http://kong-qa.zebedee.cloud:8000/v0/";
-        private readonly string apikey = "I7ifHpPJgU3h7Ewmu6gczrJayJmCIqrb";
+        private readonly string apikey = "BDQWAtIShciUlIAhXGLjuFSKjjrD2XqS";
 
         public ZebedeeLnIT(ITestOutputHelper testOutputHelper)
         {
@@ -150,7 +150,7 @@ namespace ZbdUnitySDKTest
             await task;
 
             //Latch wait
-            cde.Wait(3000);
+            cde.Wait(5000);
             if (cde.CurrentCount != 0)
             {
                 Assert.True(false, "charge call timeout ");
@@ -161,7 +161,7 @@ namespace ZbdUnitySDKTest
             cde.Reset();
 
             ///////////////////////////// SUBSCCRIBE to BOLT Invoice
-            Task<Charge> subscribeChargeTask = zbdLnService.SubscribeInvoice(chargeId);
+            Task<ChargeDetail> subscribeChargeTask = zbdLnService.SubscribeInvoice(chargeId);
 
 
             ///////////////////////////// PAYMENT to BOLT Invoice
@@ -196,7 +196,7 @@ namespace ZbdUnitySDKTest
             }
 
             //SUBSCRIPTION  ASSERT
-            Charge chargeResult = await subscribeChargeTask;
+            ChargeDetail chargeResult = await subscribeChargeTask;
 
             output.WriteLine("Status:" + chargeResult.Data.Status);
             Assert.Equal("completed",chargeResult.Data.Status);
@@ -261,7 +261,7 @@ namespace ZbdUnitySDKTest
             cde.Reset();
 
             ///////////////////////////// SUBSCCRIBE to BOLT Invoice
-            Task<Charge> subscribeChargeTask = zbdLnService.SubscribeInvoice(chargeId);
+            Task<ChargeDetail> subscribeChargeTask = zbdLnService.SubscribeInvoice(chargeId);
 
 
             /////////////////////////////// PAYMENT to BOLT Invoice 
@@ -299,7 +299,7 @@ namespace ZbdUnitySDKTest
 
             try
             {
-                Charge chargeResult = await subscribeChargeTask;
+                ChargeDetail chargeResult = await subscribeChargeTask;
                 Assert.True(false, "Timeout Exception should be thrown ");
 
             }
@@ -412,7 +412,7 @@ namespace ZbdUnitySDKTest
             Task<WithdrawResponse> subscribeWithdrawTask = zbdLnService.SubscribeWithdraw(withdrawId);
 
 
-            /////////////////////////////// WITHDRAW by WALLET  manually
+            /////////////////////////////// WITHDRAW by WALLET  manually by capturing LNURL in debug mode
 
 
             //SUBSCRIPTION  ASSERT

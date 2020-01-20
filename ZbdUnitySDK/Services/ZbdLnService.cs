@@ -25,7 +25,7 @@
 
         }
 
-        public async Task createInvoiceAsync(ChargeData chargeData, Action<Charge> invoiceAction)
+        public async Task createInvoiceAsync(ChargeData chargeData, Action<ChargeDetail> invoiceAction)
         {
             var jsonSettings = new JsonSerializerSettings();
             jsonSettings.DateTimeZoneHandling = DateTimeZoneHandling.Local;
@@ -42,7 +42,7 @@
                 string responseBody = await response.Content.ReadAsStringAsync();
 
                 //Deserialize
-                Charge deserializedCharge = JsonConvert.DeserializeObject<Charge>(responseBody, jsonSettings);
+                ChargeDetail deserializedCharge = JsonConvert.DeserializeObject<ChargeDetail>(responseBody, jsonSettings);
 
                 invoiceAction(deserializedCharge);
 
@@ -87,12 +87,12 @@
         /// </summary>
         /// <param name="invoiceUUid"></param>
         /// <returns>A <see cref="Task{TResult}"/> representing the result of the asynchronous operation.</returns>
-        public async Task<Charge> SubscribeInvoice(string invoiceUUid, int timeoutSec = 25)
+        public async Task<ChargeDetail> SubscribeInvoice(string invoiceUUid, int timeoutSec = 60)
         {
             TimeSpan delay = TimeSpan.FromSeconds(1);
-            TimeSpan timeout = TimeSpan.FromSeconds(Math.Min(timeoutSec, 25));//Max 25 sec
+            TimeSpan timeout = TimeSpan.FromSeconds(Math.Min(timeoutSec, 60));//Max 60 sec
             Task timeoutTask = Task.Delay(timeout);
-            Charge chargeDetail = null;
+            ChargeDetail chargeDetail = null;
             // Keep retry  when satus is pending or timeoutTask is not completed
             while ( (chargeDetail == null || chargeDetail.Data.Status== "pending") &&  ! timeoutTask.IsCompleted  )
             {
@@ -104,28 +104,33 @@
 
             if (timeoutTask.IsCompleted)
             {
-                throw new ZedebeeException("Get Charge Detail Timeout");
+                throw new ZedebeeException("Get Charge Detail Timeout " + timeoutTask.IsCompleted + " " + chargeDetail);
             }
 
             return chargeDetail;
         }
 
-        private  async Task<Charge> getChargeDetail(String chargeUuid)
+        private  async Task<ChargeDetail> getChargeDetail(String chargeUuid)
         {
-
-            Charge deserializedCharge = null;
+            if (String.IsNullOrEmpty(chargeUuid))
+            {
+                throw new ZedebeeException("GET Charge Detail Missing chargeUuid :" + chargeUuid);
+            }
+            ChargeDetail deserializedCharge = null;
+            string responseBody = null;
+            string url = this.zebedeeUrl + "charges/" + chargeUuid;
             try
             {
-                HttpResponseMessage response = await Client.GetAsync(this.zebedeeUrl + "charges/" + chargeUuid);
+                HttpResponseMessage response = await Client.GetAsync(url);
+                responseBody = await response.Content.ReadAsStringAsync();
                 response.EnsureSuccessStatusCode();
-                string responseBody = await response.Content.ReadAsStringAsync();
                 //Deserialize
-                deserializedCharge = JsonConvert.DeserializeObject<Charge>(responseBody, jsonSettings);
+                deserializedCharge = JsonConvert.DeserializeObject<ChargeDetail>(responseBody, jsonSettings);
             }
-            catch (HttpRequestException e)
+            catch (Exception e)
             {
-                Console.WriteLine("GET Charge with Exception :" + e);
-                throw e;
+                Console.WriteLine("Get Charge with Exception :" + e);
+                throw new ZedebeeException("Get Charge Detail ends with Exception :" + url + "-" + responseBody, e);
             }
             return deserializedCharge;
         }
@@ -155,10 +160,10 @@
 
         }
 
-        public async Task<WithdrawResponse> SubscribeWithdraw(string withdrawUuid, int timeoutSec = 25)
+        public async Task<WithdrawResponse> SubscribeWithdraw(string withdrawUuid, int timeoutSec = 60)
         {
             TimeSpan delay = TimeSpan.FromSeconds(1);
-            TimeSpan timeout = TimeSpan.FromSeconds(Math.Min(timeoutSec, 25));//Max 25 sec
+            TimeSpan timeout = TimeSpan.FromSeconds(Math.Min(timeoutSec, 60));//Max 60 sec
             Task timeoutTask = Task.Delay(timeout);
             WithdrawResponse withdrawDetail = null;
             // Keep retry  when satus is pending or timeoutTask is not completed
