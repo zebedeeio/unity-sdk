@@ -88,7 +88,17 @@ This repository also contains a Sample Unity project under `/<Project Folder>/Un
 
 1. Open this folder with the latest Unity software.
 2. Open the ZEBEDEE scene.
-3. Set the ZEBEDEE URL and your API Key (found in ZEBEDEE's Developer Dashboard).
+3. Set the ZEBEDEE URL and your API Key (found in ZEBEDEE's Developer Dashboard) on the Game Object *ZebedeeClient*
 4. Start the game.
+5. Test Player paying to the Game (Genarating BOLT Invoice)
+   1. Input Description and Amount in satoshis
+   2. Click "Pay for Game Item"
+   3. Open you lightning wallet and SCan the QR code
+   4. QR image turns in to Paid Image
+6. Test Player withdrawing from the Game (Generating LNURL withdraw)
+   1. Input Description and Amount in satoshis
+   2. Click "Withdraw my Sats"
+   3. Open you LNURL-supported lightning wallet and scan
+   4. QR image turns in to Withdraw Complete Image
 
 ![Unity Demo project](README_img/zbdSDK_unity.png)
