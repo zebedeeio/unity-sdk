@@ -3,24 +3,31 @@
     using System;
     using System.Threading.Tasks;
     using UnityEngine;
+    using ZbdUnitySDK.Logging;
     using ZbdUnitySDK.models;
     using ZbdUnitySDK.Models.Zebedee;
     using ZbdUnitySDK.Services;
+    using IZdbLogger = Logging.IZdbLogger;
 
     public class ZebedeeClient
     {
         private ZbdLnService zbdService;
+        private IZdbLogger logger;
 
         public ZebedeeClient(string baseUrl,string apikey)
         {
             this.zbdService = new ZbdLnService(baseUrl, apikey);
+            this.logger = LoggerFactory.GetLogger();
         }
         public async Task CreateInvoice(InvoiceRequest invoice, Action<ChargeDetail> invoiceAction)
         {
+
             ChargeData chargeData = new ChargeData();
             chargeData.Amount = invoice.MilliSatoshiAmount;
             chargeData.Description = invoice.Description;
             chargeData.Name = invoice.Description;
+
+            logger.Debug("CreateInvoice with amount:" + chargeData.Amount);
 
             await zbdService.createInvoiceAsync(chargeData, charge => {
                 invoiceAction(charge);
@@ -32,6 +39,7 @@
         {
 
             ChargeDetail chargeDetail =  await zbdService.SubscribeInvoice(chargeId);
+            logger.Debug("SubscribeChargeAsync with amount:" + chargeDetail.Data.Amount);
             return chargeDetail.Data.Status;
         }
 

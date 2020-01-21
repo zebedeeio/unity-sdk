@@ -2,6 +2,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using ZbdUnitySDK;
+using ZbdUnitySDK.Logging;
 using ZbdUnitySDK.models;
 using ZbdUnitySDK.Models.Zebedee;
 using ZXing;
@@ -18,10 +19,12 @@ public class ZebedeeZbd : MonoBehaviour
     public GameObject QRcodeLnURL;
 
     private ZebedeeClient zbdClient = null;
+    private IZdbLogger logger;
 
     public void Start()
     {
         zbdClient = new ZebedeeClient(zebedeeBaseUrl, apiKey);
+        this.logger = LoggerFactory.GetLogger();
     }
 
     public async void CreateInvoice()
@@ -31,6 +34,8 @@ public class ZebedeeZbd : MonoBehaviour
         InvoiceRequest invoiceReq = new InvoiceRequest();
         invoiceReq.Description = product.text;
         invoiceReq.MilliSatoshiAmount = int.Parse(amount.text) * 1000;
+
+        logger.Debug("CreateInvoice:"+invoiceReq.Description);
 
         //2.Create Invoice with initial data and get the full invoice
         //2.Zebedee Serverにインボイスデータをサブミットして、インボイスの詳細データを取得する。
@@ -66,13 +71,13 @@ public class ZebedeeZbd : MonoBehaviour
             //インボイスのステータスがcompleteであれば、全額が支払われた状態なので、支払完了のイメージに変更する
             //Change the image from QR to Paid
             QRcodeBOLT11.GetComponent<Image>().sprite = Resources.Load<Sprite>("image/paid");
-            Debug.Log("payment is complete");
+            logger.Debug("payment is complete");
         }
         else
         {
             //for example, if the amount paid is not full, do something.the line below just print the status.
             //全額支払いでない場合には、なにか処理をおこなう。以下は、ただ　ステータスを表示して終了。
-            Debug.Log("payment is not completed:" +status);
+            logger.Error("payment is not completed:" +status);
         }
     }
 
@@ -96,8 +101,8 @@ public class ZebedeeZbd : MonoBehaviour
         string lnURL = withdraw.Data.Lnurl;
         if (string.IsNullOrEmpty(lnURL))
         {
-            Debug.Log("lnURL is not set in withdrawal response.");
-            Debug.Log(withdraw.Data.Lnurl);
+            logger.Debug("lnURL is not set in withdrawal response.");
+            logger.Debug(withdraw.Data.Lnurl);
             return;
         }
 
@@ -118,13 +123,13 @@ public class ZebedeeZbd : MonoBehaviour
             //インボイスのステータスがcompleteであれば、全額が支払われた状態なので、支払完了のイメージに変更する
             //Change the image from QR to Paid
             QRcodeLnURL.GetComponent<Image>().sprite = Resources.Load<Sprite>("image/withdrawn");
-            Debug.Log("withdraw is success");
+            logger.Debug("withdraw is success");
         }
         else
         {
             //for example, if the amount paid is not full, do something.the line below just print the status.
             //全額支払いでない場合には、なにか処理をおこなう。以下は、ただ　ステータスを表示して終了。
-            Debug.Log("withdraw is not success:" + status);
+            logger.Error("withdraw is not success:" + status);
         }
 
     }
@@ -132,7 +137,7 @@ public class ZebedeeZbd : MonoBehaviour
 
     private Texture2D GenerateQR(string text)
     {
-        Debug.Log("generateQR():generateing Qr for text: " + text);
+        logger.Debug("generateQR():generateing Qr for text: " + text);
           
         var encoded = new Texture2D(384, 384);
         var color32 = Encode(text, encoded.width, encoded.height);

@@ -408,11 +408,12 @@ namespace ZbdUnitySDKTest
 
             cde.Reset();
 
+
             /////////////////////////////// SUBSCCRIBE to Withdrawal
             Task<WithdrawResponse> subscribeWithdrawTask = zbdLnService.SubscribeWithdraw(withdrawId);
 
+            /////////////////////////////// HERE WITHDRAW by WALLET  manually by capturing LNURL in debug mode
 
-            /////////////////////////////// WITHDRAW by WALLET  manually by capturing LNURL in debug mode
 
 
             //SUBSCRIPTION  ASSERT

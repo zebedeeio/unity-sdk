@@ -4,21 +4,22 @@
     using System.Collections.Generic;
     using System.Text;
 
-
     public enum LogType
     {
         CONSOLE,
         LOG4NET,
         UNITY_DEBUG,
-        XUNIT,
+//        XUNIT,    //XUNIT DOESNOT ALLOW LOGGING
     }
 
-    public interface ILogger
+    public interface IZdbLogger
     {
 
         void Debug(string mesg);
 
         void Info(string mesg);
+
+        void Warn(string mesg);
 
         void Error(string mesg);
     }

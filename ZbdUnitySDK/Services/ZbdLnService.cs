@@ -6,14 +6,15 @@
     using System.Threading.Tasks;
     using Newtonsoft.Json;
     using ZbdUnitySDK.Exception;
+    using ZbdUnitySDK.Logging;
     using ZbdUnitySDK.Models.Zebedee;
 
     public class ZbdLnService
     {
         private string zebedeeUrl = null;
-        private static readonly HttpClient Client = new HttpClient();
+        private static readonly HttpClient client = new HttpClient();
         private static JsonSerializerSettings jsonSettings = null;
-
+        private IZdbLogger logger;
         public ZbdLnService(string zebedeeUrl, string zebedeeAuth)
         {
             this.zebedeeUrl = zebedeeUrl;
@@ -21,7 +22,8 @@
             jsonSettings = new JsonSerializerSettings();
             jsonSettings.DateTimeZoneHandling = DateTimeZoneHandling.Local;
             jsonSettings.NullValueHandling = NullValueHandling.Ignore;
-            Client.DefaultRequestHeaders.Add("apikey", zebedeeAuth);
+            client.DefaultRequestHeaders.Add("apikey", zebedeeAuth);
+            this.logger = LoggerFactory.GetLogger();
 
         }
 
@@ -31,26 +33,27 @@
             jsonSettings.DateTimeZoneHandling = DateTimeZoneHandling.Local;
             jsonSettings.NullValueHandling = NullValueHandling.Ignore;
 
+            logger.Debug("createInvoiceAsync [REQ]:" + chargeData.Description);
 
             try
             {
                 string bodyJson = JsonConvert.SerializeObject(chargeData,jsonSettings);
 
                 StringContent httpContent = new StringContent(bodyJson, Encoding.UTF8, "application/json");
-                HttpResponseMessage response = await Client.PostAsync(zebedeeUrl + "charges",httpContent);
+                HttpResponseMessage response = await client.PostAsync(zebedeeUrl + "charges",httpContent);
                 response.EnsureSuccessStatusCode();
                 string responseBody = await response.Content.ReadAsStringAsync();
 
                 //Deserialize
                 ChargeDetail deserializedCharge = JsonConvert.DeserializeObject<ChargeDetail>(responseBody, jsonSettings);
+                logger.Debug("createInvoiceAsync[RES]:" + deserializedCharge.Data.Id);
 
                 invoiceAction(deserializedCharge);
 
             }
             catch (HttpRequestException e)
             {
-                Console.WriteLine("\nException Caught!");
-                Console.WriteLine("Message :{0} ", e.Message);
+                logger.Error(string.Format("Error :{0} ", e.Message));
                 throw e;
             }
 
@@ -61,20 +64,22 @@
             try
             {
                 string json = JsonConvert.SerializeObject(paymentRequest, jsonSettings);
+                logger.Debug("payInvoiceAsync[REQ]:" + paymentRequest.Description);
 
                 StringContent httpContent = new StringContent(json, Encoding.UTF8, "application/json");
-                HttpResponseMessage response = await Client.PostAsync(this.zebedeeUrl + "payments", httpContent);
+                HttpResponseMessage response = await client.PostAsync(this.zebedeeUrl + "payments", httpContent);
                 response.EnsureSuccessStatusCode();
                 string responseBody = await response.Content.ReadAsStringAsync();
                 //Deserialize
-                PaymentResponse deserializedCharge = JsonConvert.DeserializeObject<PaymentResponse>(responseBody, jsonSettings);
+                PaymentResponse deserializedPayment = JsonConvert.DeserializeObject<PaymentResponse>(responseBody, jsonSettings);
+                logger.Debug("payInvoiceAsync[RES]:" + deserializedPayment.Data.Id);
 
-                paymentction(deserializedCharge);
+                paymentction(deserializedPayment);
 
             }
             catch (HttpRequestException e)
             {
-                Console.WriteLine("Message :{0} ", e.Message);
+                logger.Error(string.Format("Message :{0} ", e.Message));
                 throw e;
             }
         }
@@ -89,22 +94,22 @@
         /// <returns>A <see cref="Task{TResult}"/> representing the result of the asynchronous operation.</returns>
         public async Task<ChargeDetail> SubscribeInvoice(string invoiceUUid, int timeoutSec = 60)
         {
+            logger.Debug("SubscribeInvoice[REQ]:" + invoiceUUid);
             TimeSpan delay = TimeSpan.FromSeconds(1);
             TimeSpan timeout = TimeSpan.FromSeconds(Math.Min(timeoutSec, 60));//Max 60 sec
+
             Task timeoutTask = Task.Delay(timeout);
             ChargeDetail chargeDetail = null;
             // Keep retry  when satus is pending or timeoutTask is not completed
             while ( (chargeDetail == null || chargeDetail.Data.Status== "pending") &&  ! timeoutTask.IsCompleted  )
             {
-
                 chargeDetail = await getChargeDetail(invoiceUUid);
                 await Task.Delay(delay);
-
             }
 
             if (timeoutTask.IsCompleted)
             {
-                throw new ZedebeeException("Get Charge Detail Timeout " + timeoutTask.IsCompleted + " " + chargeDetail);
+                throw new ZedebeeException("Get Charge Detail Timed-out in " + timeout);
             }
 
             return chargeDetail;
@@ -121,7 +126,7 @@
             string url = this.zebedeeUrl + "charges/" + chargeUuid;
             try
             {
-                HttpResponseMessage response = await Client.GetAsync(url);
+                HttpResponseMessage response = await client.GetAsync(url);
                 responseBody = await response.Content.ReadAsStringAsync();
                 response.EnsureSuccessStatusCode();
                 //Deserialize
@@ -129,7 +134,7 @@
             }
             catch (Exception e)
             {
-                Console.WriteLine("Get Charge with Exception :" + e);
+                logger.Error(string.Format("Get Charge with Exception :" + e));
                 throw new ZedebeeException("Get Charge Detail ends with Exception :" + url + "-" + responseBody, e);
             }
             return deserializedCharge;
@@ -140,9 +145,10 @@
         {
             try
             {
+                logger.Debug("WithdrawAsync:" + withdrawRequest.Description);
                 string json = JsonConvert.SerializeObject(withdrawRequest, jsonSettings);
                 StringContent httpContent = new StringContent(json, Encoding.UTF8, "application/json");
-                HttpResponseMessage response = await Client.PostAsync(this.zebedeeUrl + "withdrawal-requests-create", httpContent);
+                HttpResponseMessage response = await client.PostAsync(this.zebedeeUrl + "withdrawal-requests-create", httpContent);
                 response.EnsureSuccessStatusCode();
                 string responseBody = await response.Content.ReadAsStringAsync();
 
@@ -154,7 +160,7 @@
             }
             catch (HttpRequestException e)
             {
-                Console.WriteLine("Withdrawal with Exception :" + e);
+                logger.Error(string.Format("WithdrawAsync with Exception : {0}", e));
                 throw e;
             }
 
@@ -162,6 +168,7 @@
 
         public async Task<WithdrawResponse> SubscribeWithdraw(string withdrawUuid, int timeoutSec = 60)
         {
+            logger.Debug("SubscribeWithdraw:" + withdrawUuid);
             TimeSpan delay = TimeSpan.FromSeconds(1);
             TimeSpan timeout = TimeSpan.FromSeconds(Math.Min(timeoutSec, 60));//Max 60 sec
             Task timeoutTask = Task.Delay(timeout);
@@ -188,7 +195,7 @@
             WithdrawResponse withdrawDetail = null;
             try
             {
-                HttpResponseMessage response = await Client.GetAsync(this.zebedeeUrl + "withdrawal-requests/" + withdrawUuid);
+                HttpResponseMessage response = await client.GetAsync(this.zebedeeUrl + "withdrawal-requests/" + withdrawUuid);
                 response.EnsureSuccessStatusCode();
                 string responseBody = await response.Content.ReadAsStringAsync();
                 //Deserialize
@@ -196,7 +203,7 @@
             }
             catch (HttpRequestException e)
             {
-                Console.WriteLine("GET WithDraw with Exception :" + e);
+                logger.Error(string.Format("GET WithDraw with Exception: {0}", e));
                 throw e;
             }
             return withdrawDetail;
