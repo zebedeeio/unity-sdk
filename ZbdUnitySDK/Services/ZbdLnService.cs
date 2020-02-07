@@ -27,7 +27,14 @@
 
         }
 
-        public async Task createInvoiceAsync(ChargeData chargeData, Action<ChargeDetail> invoiceAction)
+        public async Task CreateInvoiceAsync(ChargeData chargeData, Action<ChargeDetail> invoiceAction)
+        {
+            ChargeDetail deserializedCharge = await CreateInvoiceAsync(chargeData);
+            logger.Debug("createInvoiceAsync[RES]:" + deserializedCharge.Data.Id);
+            invoiceAction(deserializedCharge);
+        }
+
+        public async Task<ChargeDetail> CreateInvoiceAsync(ChargeData chargeData)
         {
             var jsonSettings = new JsonSerializerSettings();
             jsonSettings.DateTimeZoneHandling = DateTimeZoneHandling.Local;
@@ -37,18 +44,17 @@
 
             try
             {
-                string bodyJson = JsonConvert.SerializeObject(chargeData,jsonSettings);
+                string bodyJson = JsonConvert.SerializeObject(chargeData, jsonSettings);
 
                 StringContent httpContent = new StringContent(bodyJson, Encoding.UTF8, "application/json");
-                HttpResponseMessage response = await client.PostAsync(zebedeeUrl + "charges",httpContent);
+                HttpResponseMessage response = await client.PostAsync(zebedeeUrl + "charges", httpContent);
                 response.EnsureSuccessStatusCode();
                 string responseBody = await response.Content.ReadAsStringAsync();
 
                 //Deserialize
                 ChargeDetail deserializedCharge = JsonConvert.DeserializeObject<ChargeDetail>(responseBody, jsonSettings);
                 logger.Debug("createInvoiceAsync[RES]:" + deserializedCharge.Data.Id);
-
-                invoiceAction(deserializedCharge);
+                return deserializedCharge;
 
             }
             catch (HttpRequestException e)
@@ -59,7 +65,7 @@
 
         }
 
-        public async Task payInvoiceAsync(PaymentRequest paymentRequest, Action<PaymentResponse> paymentction)
+        public async Task PayInvoiceAsync(PaymentRequest paymentRequest, Action<PaymentResponse> paymentction)
         {
             try
             {
@@ -92,7 +98,7 @@
         /// </summary>
         /// <param name="invoiceUUid"></param>
         /// <returns>A <see cref="Task{TResult}"/> representing the result of the asynchronous operation.</returns>
-        public async Task<ChargeDetail> SubscribeInvoice(string invoiceUUid, int timeoutSec = 60)
+        public async Task<ChargeDetail> SubscribeInvoiceAsync(string invoiceUUid, int timeoutSec = 60)
         {
             logger.Debug("SubscribeInvoice[REQ]:" + invoiceUUid);
             TimeSpan delay = TimeSpan.FromSeconds(1);
@@ -103,7 +109,7 @@
             // Keep retry  when satus is pending or timeoutTask is not completed
             while ( (chargeDetail == null || chargeDetail.Data.Status== "pending") &&  ! timeoutTask.IsCompleted  )
             {
-                chargeDetail = await getChargeDetail(invoiceUUid);
+                chargeDetail = await getChargeDetailAsync(invoiceUUid);
                 await Task.Delay(delay);
             }
 
@@ -115,7 +121,7 @@
             return chargeDetail;
         }
 
-        private  async Task<ChargeDetail> getChargeDetail(String chargeUuid)
+        private  async Task<ChargeDetail> getChargeDetailAsync(String chargeUuid)
         {
             if (String.IsNullOrEmpty(chargeUuid))
             {
@@ -143,6 +149,15 @@
 
         public async Task WithdrawAsync(WithdrawRequest withdrawRequest, Action<WithdrawResponse> withdrawAction)
         {
+            //Deserialize
+            WithdrawResponse deserializedCharge = await WithdrawAsync(withdrawRequest);
+
+            withdrawAction(deserializedCharge);
+
+        }
+
+        public async Task<WithdrawResponse> WithdrawAsync(WithdrawRequest withdrawRequest)
+        {
             try
             {
                 logger.Debug("WithdrawAsync:" + withdrawRequest.Description);
@@ -154,8 +169,7 @@
 
                 //Deserialize
                 WithdrawResponse deserializedCharge = JsonConvert.DeserializeObject<WithdrawResponse>(responseBody, jsonSettings);
-
-                withdrawAction(deserializedCharge);
+                return deserializedCharge;
 
             }
             catch (HttpRequestException e)
@@ -166,7 +180,7 @@
 
         }
 
-        public async Task<WithdrawResponse> SubscribeWithdraw(string withdrawUuid, int timeoutSec = 60)
+        public async Task<WithdrawResponse> SubscribeWithdrawAsync(string withdrawUuid, int timeoutSec = 60)
         {
             logger.Debug("SubscribeWithdraw:" + withdrawUuid);
             TimeSpan delay = TimeSpan.FromSeconds(1);
@@ -177,7 +191,7 @@
             while ((withdrawDetail == null || withdrawDetail.Data.Status == "pending") && !timeoutTask.IsCompleted)
             {
 
-                withdrawDetail = await getWithdrawDetail(withdrawUuid);
+                withdrawDetail = await getWithdrawDetailAsync(withdrawUuid);
                 await Task.Delay(delay);
 
             }
@@ -189,7 +203,7 @@
 
             return withdrawDetail;
         }
-        private async Task<WithdrawResponse> getWithdrawDetail(String withdrawUuid)
+        private async Task<WithdrawResponse> getWithdrawDetailAsync(String withdrawUuid)
         {
 
             WithdrawResponse withdrawDetail = null;

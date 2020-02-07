@@ -9,7 +9,7 @@ using ZbdUnitySDK.Services;
 
 namespace ZbdUnitySDKTest
 {
-    public class ZebedeeLnIT
+    public class ZebedeeLnIT    
     {
 
         private readonly ITestOutputHelper output;
@@ -39,7 +39,7 @@ namespace ZbdUnitySDKTest
             CountdownEvent cde = new CountdownEvent(1); // initial count = 1
             String bolt = "";
             //Call the API and assert within the callback
-            Task task = zbdLnService.createInvoiceAsync(chargeData, charge =>
+            Task task = zbdLnService.CreateInvoiceAsync(chargeData, charge =>
             {
                 try
                 {
@@ -79,7 +79,7 @@ namespace ZbdUnitySDKTest
             paymentRequest.Description = "CSHARP TEST SELF INVOICE PAUYMENT " + DateTime.Now;
             paymentRequest.InternalId = "PAYMENT-" + DateTime.Now.ToShortTimeString();
 
-            task = zbdLnService.payInvoiceAsync(paymentRequest, paymentResponse =>
+            task = zbdLnService.PayInvoiceAsync(paymentRequest, paymentResponse =>
             {
                 try
                 {
@@ -125,7 +125,7 @@ namespace ZbdUnitySDKTest
             String chargeId = "";
 
             //Call the API and assert within the callback
-            Task task = zbdLnService.createInvoiceAsync(chargeData, charge =>
+            Task task = zbdLnService.CreateInvoiceAsync(chargeData, charge =>
             {
                 try
                 {
@@ -161,7 +161,7 @@ namespace ZbdUnitySDKTest
             cde.Reset();
 
             ///////////////////////////// SUBSCCRIBE to BOLT Invoice
-            Task<ChargeDetail> subscribeChargeTask = zbdLnService.SubscribeInvoice(chargeId);
+            Task<ChargeDetail> subscribeChargeTask = zbdLnService.SubscribeInvoiceAsync(chargeId);
 
 
             ///////////////////////////// PAYMENT to BOLT Invoice
@@ -170,7 +170,7 @@ namespace ZbdUnitySDKTest
             paymentRequest.Description = "CSHARP TEST SELF INVOICE PAUYMENT " + DateTime.Now;
             paymentRequest.InternalId = "PAYMENT-" + DateTime.Now.ToShortTimeString();
 
-            task = zbdLnService.payInvoiceAsync(paymentRequest, paymentResponse =>
+            task = zbdLnService.PayInvoiceAsync(paymentRequest, paymentResponse =>
             {
                 try
                 {
@@ -225,7 +225,7 @@ namespace ZbdUnitySDKTest
             String chargeId = "";
 
             //Call the API and assert within the callback
-            Task task = zbdLnService.createInvoiceAsync(chargeData, charge =>
+            Task task = zbdLnService.CreateInvoiceAsync(chargeData, charge =>
             {
                 try
                 {
@@ -261,7 +261,7 @@ namespace ZbdUnitySDKTest
             cde.Reset();
 
             ///////////////////////////// SUBSCCRIBE to BOLT Invoice
-            Task<ChargeDetail> subscribeChargeTask = zbdLnService.SubscribeInvoice(chargeId);
+            Task<ChargeDetail> subscribeChargeTask = zbdLnService.SubscribeInvoiceAsync(chargeId);
 
 
             /////////////////////////////// PAYMENT to BOLT Invoice 
@@ -410,7 +410,7 @@ namespace ZbdUnitySDKTest
 
 
             /////////////////////////////// SUBSCCRIBE to Withdrawal
-            Task<WithdrawResponse> subscribeWithdrawTask = zbdLnService.SubscribeWithdraw(withdrawId);
+            Task<WithdrawResponse> subscribeWithdrawTask = zbdLnService.SubscribeWithdrawAsync(withdrawId);
 
             /////////////////////////////// HERE WITHDRAW by WALLET  manually by capturing LNURL in debug mode
 

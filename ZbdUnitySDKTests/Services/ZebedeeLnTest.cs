@@ -69,7 +69,7 @@ namespace ZbdUnitySDKTest
             CountdownEvent cde = new CountdownEvent(1); // initial count = 1
             String bolt = "";
             //Call the API 
-            Task task = zbdLnService.createInvoiceAsync(chargeData, charge =>
+            Task task = zbdLnService.CreateInvoiceAsync(chargeData, charge =>
             {
                 try
                 {

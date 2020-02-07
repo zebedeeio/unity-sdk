@@ -7,6 +7,9 @@ using ZbdUnitySDK.Logging;
 
 namespace ZebedeeSDKRun
 {
+    /// <summary>
+    /// This is class to test Zebedee logging because Test framework doesnot allow do console output.
+    /// </summary>
     class Program
     {
         static void Main(string[] args)
