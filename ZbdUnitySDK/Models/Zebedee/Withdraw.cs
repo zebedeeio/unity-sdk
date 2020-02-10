@@ -1,6 +1,7 @@
 ﻿namespace ZbdUnitySDK.Models.Zebedee
 {
     using Newtonsoft.Json;
+    using System;
 
     public class WithdrawRequest
     {
@@ -23,15 +24,30 @@
     public class WithdrawData
     {
         public string Id { get; set; }
-        public int Fee { get; set; }
-
-        public string Lnurl { get; set; }
+        public string Unit { get; set; }
 
         public long Amount { get; set; }
 
-        public string Status { get; set; }
         public string InternalId { get; set; }
+
         public string Description { get; set; }
+
+        public string Status { get; set; }
+
+        public WithdrawInvoice Invoice { get; set; }
+
+        public DateTime CreatedAt { get; set; }
+
+
     }
+
+    public class WithdrawInvoice
+    {
+        public string Request { get; set; }
+
+//        public DateTime ExpiresAt { get; set; }
+    }
+
+
 
 }

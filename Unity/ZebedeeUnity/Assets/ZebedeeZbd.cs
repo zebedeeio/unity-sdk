@@ -39,7 +39,7 @@ public class ZebedeeZbd : MonoBehaviour
 
         //2.Create Invoice with initial data and get the full invoice
         //2.Zebedee Serverにインボイスデータをサブミットして、インボイスの詳細データを取得する。
-        await zbdClient.CreateInvoice(invoiceReq, handleInvoice);
+        await zbdClient.CreateInvoiceAsync(invoiceReq, handleInvoice);
 
     }
 
@@ -98,11 +98,11 @@ public class ZebedeeZbd : MonoBehaviour
 
     private async void handleWithdrawal(WithdrawResponse withdraw)
     {
-        string lnURL = withdraw.Data.Lnurl;
+        string lnURL = withdraw.Data.Invoice.Request;
         if (string.IsNullOrEmpty(lnURL))
         {
             logger.Debug("lnURL is not set in withdrawal response.");
-            logger.Debug(withdraw.Data.Lnurl);
+            logger.Debug(withdraw.Data.Invoice.Request);
             return;
         }
 
@@ -118,7 +118,7 @@ public class ZebedeeZbd : MonoBehaviour
         //StartCoroutine(btcPayClient.listenInvoice(invoice.Id, printInvoice));
         string status = await zbdClient.SubscribeWithDrawAsync(withdraw.Data.Id);
 
-        if ("success".Equals(status))
+        if ("completed".Equals(status))
         {
             //インボイスのステータスがcompleteであれば、全額が支払われた状態なので、支払完了のイメージに変更する
             //Change the image from QR to Paid

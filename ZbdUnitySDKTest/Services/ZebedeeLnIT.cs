@@ -13,12 +13,63 @@ namespace ZbdUnitySDKTest
     {
 
         private readonly ITestOutputHelper output;
-        private readonly string zebedeeUrl = "http://kong-qa.zebedee.cloud:8000/v0/";
-        private readonly string apikey = "BDQWAtIShciUlIAhXGLjuFSKjjrD2XqS";
+        private readonly string zebedeeUrl = "https://beta-api.zebedee.io/v0/";
+        private readonly string apikey = "z56feHNrcHNBYlcsVwji0qK7TojdBBP6";
 
         public ZebedeeLnIT(ITestOutputHelper testOutputHelper)
         {
             this.output = testOutputHelper;
+        }
+
+        [Fact]
+        public async void InvoiceCreationTest()
+        {
+            string testDesc = "CSHARP IT TEST DES for Charge ";
+
+            //service setup
+            ZbdLnService zbdLnService = new ZbdLnService(zebedeeUrl, apikey);
+
+            ///////////////////////////// Create Invoice
+            ChargeData chargeData = new ChargeData();
+            chargeData.Name = testDesc;
+            chargeData.Description = testDesc;
+            chargeData.Amount = 1000;
+
+            //Countdown Latch
+            CountdownEvent cde = new CountdownEvent(1); // initial count = 1
+            String bolt = "";
+            //Call the API and assert within the callback
+            Task task = zbdLnService.CreateInvoiceAsync(chargeData, charge =>
+            {
+                try
+                {
+                    Assert.NotNull(charge.Data);
+                    Assert.NotNull(charge.Data.Invoice);
+                    Assert.NotNull(charge.Data.Invoice.Request);
+                    Assert.Equal(testDesc, charge.Data.Description);
+                    Assert.StartsWith("lnbc10n1", charge.Data.Invoice.Request);
+                    output.WriteLine("in action bolt:" + charge.Data.Invoice.Request);
+                    output.WriteLine("in action amount:" + charge.Data.Amount);
+                    //Memo BOLT11 for payment
+                    bolt = charge.Data.Invoice.Request;
+                }
+                finally
+                {
+                    cde.Signal();
+                }
+            });
+            await task;
+
+            //Latch wait
+            cde.Wait(3000);
+            if (cde.CurrentCount != 0)
+            {
+                Assert.True(false, "charge call timeout ");
+            }
+
+            output.WriteLine("outside:" + bolt);
+
+            cde.Reset();
         }
 
         [Fact]
@@ -106,7 +157,7 @@ namespace ZbdUnitySDKTest
         }
 
         [Fact]
-        public async void InvoiceCreationAndSettlement()
+        public async void InvoiceCreationAndSubscribeToSettlement()
         {
             string testDesc = "CSHARP IT TEST DES for Charge/Settlement ";
 
@@ -332,12 +383,12 @@ namespace ZbdUnitySDKTest
             {
                 try
                 {
-                    Assert.NotNull(withdrawResponse.Data.Lnurl);
+                    Assert.NotNull(withdrawResponse.Data.Invoice.Request);
                     Assert.NotNull(withdrawResponse.Data.Id);
                     Assert.Equal(testAmount, withdrawResponse.Data.Amount);
-                    Assert.StartsWith("lnurl", withdrawResponse.Data.Lnurl);
+                    Assert.StartsWith("lnurl", withdrawResponse.Data.Invoice.Request);
 
-                    output.WriteLine("in action lnurl:" + withdrawResponse.Data.Lnurl);
+                    output.WriteLine("in action lnurl:" + withdrawResponse.Data.Invoice.Request);
                     output.WriteLine("in action id:" + withdrawResponse.Data.Id);
                     output.WriteLine("in action amount:" + withdrawResponse.Data.Amount);
                 }
@@ -351,7 +402,7 @@ namespace ZbdUnitySDKTest
             cde.Wait(5000);
             if (cde.CurrentCount != 0)
             {
-                Assert.True(false, "charge call timeout ");
+                Assert.True(false, "withdraw call timeout ");
             }
         }
 
@@ -380,16 +431,16 @@ namespace ZbdUnitySDKTest
             {
                 try
                 {
-                    Assert.NotNull(withdrawResponse.Data.Lnurl);
+                    Assert.NotNull(withdrawResponse.Data.Invoice.Request);
                     Assert.NotNull(withdrawResponse.Data.Id);
                     Assert.Equal(testAmount, withdrawResponse.Data.Amount);
-                    Assert.StartsWith("lnurl", withdrawResponse.Data.Lnurl);
+                    Assert.StartsWith("lnurl", withdrawResponse.Data.Invoice.Request);
 
-                    output.WriteLine("in action lnurl:" + withdrawResponse.Data.Lnurl);
+                    output.WriteLine("in action lnurl:" + withdrawResponse.Data.Invoice.Request);
                     output.WriteLine("in action id:" + withdrawResponse.Data.Id);
                     output.WriteLine("in action amount:" + withdrawResponse.Data.Amount);
                     withdrawId = withdrawResponse.Data.Id;
-                    lnurl = withdrawResponse.Data.Lnurl;
+                    lnurl = withdrawResponse.Data.Invoice.Request;
                 }
                 finally
                 {
@@ -417,10 +468,10 @@ namespace ZbdUnitySDKTest
 
 
             //SUBSCRIPTION  ASSERT
-            WithdrawResponse chargeResult = await subscribeWithdrawTask;
+            WithdrawResponse withdrawResult = await subscribeWithdrawTask;
 
-            output.WriteLine("Status:" + chargeResult.Data.Status);
-            Assert.Equal("success", chargeResult.Data.Status);
+            output.WriteLine("Status:" + withdrawResult.Data.Status);
+            Assert.Equal("completed", withdrawResult.Data.Status);
 
 
 

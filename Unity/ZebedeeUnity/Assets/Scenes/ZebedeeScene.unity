@@ -354,8 +354,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c970684804ce3f043bf1e093c3c1e0ea, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  apiKey: BDQWAtIShciUlIAhXGLjuFSKjjrD2XqS
-  zebedeeBaseUrl: http://kong-qa.zebedee.cloud:8000/v0/
+  apiKey: z56feHNrcHNBYlcsVwji0qK7TojdBBP6
+  zebedeeBaseUrl: https://beta-api.zebedee.io/v0/
   product: {fileID: 2096148998}
   amount: {fileID: 629152070}
   QRcodeBOLT11: {fileID: 1182835226}

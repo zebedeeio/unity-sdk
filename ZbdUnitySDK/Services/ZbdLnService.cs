@@ -57,7 +57,7 @@
                 return deserializedCharge;
 
             }
-            catch (HttpRequestException e)
+            catch (Exception e)
             {
                 logger.Error(string.Format("Error :{0} ", e.Message));
                 throw e;
@@ -83,7 +83,7 @@
                 paymentction(deserializedPayment);
 
             }
-            catch (HttpRequestException e)
+            catch (Exception e)
             {
                 logger.Error(string.Format("Message :{0} ", e.Message));
                 throw e;
@@ -163,7 +163,7 @@
                 logger.Debug("WithdrawAsync:" + withdrawRequest.Description);
                 string json = JsonConvert.SerializeObject(withdrawRequest, jsonSettings);
                 StringContent httpContent = new StringContent(json, Encoding.UTF8, "application/json");
-                HttpResponseMessage response = await client.PostAsync(this.zebedeeUrl + "withdrawal-requests-create", httpContent);
+                HttpResponseMessage response = await client.PostAsync(this.zebedeeUrl + "withdrawal-requests", httpContent);
                 response.EnsureSuccessStatusCode();
                 string responseBody = await response.Content.ReadAsStringAsync();
 
@@ -172,7 +172,7 @@
                 return deserializedCharge;
 
             }
-            catch (HttpRequestException e)
+            catch (Exception e)
             {
                 logger.Error(string.Format("WithdrawAsync with Exception : {0}", e));
                 throw e;
@@ -215,7 +215,7 @@
                 //Deserialize
                 withdrawDetail = JsonConvert.DeserializeObject<WithdrawResponse>(responseBody, jsonSettings);
             }
-            catch (HttpRequestException e)
+            catch (Exception e)
             {
                 logger.Error(string.Format("GET WithDraw with Exception: {0}", e));
                 throw e;
