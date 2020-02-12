@@ -1,5 +1,10 @@
 ﻿namespace ZbdUnitySDK.UnityUtils
 {
+    /*
+        Copyright (c) 2013-2019 BitPay, Inc. Licensed under The MIT License (MIT)
+        See license text at https://github.com/bitpay/csharp-bitpay-client#license
+    */
+
     using System;
     using System.IO;
     using System.Security.Cryptography;

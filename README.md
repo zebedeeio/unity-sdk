@@ -102,3 +102,17 @@ This repository also contains a Sample Unity project under `/<Project Folder>/Un
    4. QR image turns in to Withdraw Complete Image
 
 ![Unity Demo project](README_img/zbdSDK_unity.png)
+
+
+# Acknowledgement
+This SDK depends on several opensource projects below.
+
+| Project     |  License   |  URL   |
+|----------|----------------|-----------|
+| Bitpay Csharp client| MIT | https://github.com/bitpay/csharp-bitpay-client#license|
+| NBitcoin            | MIT | https://github.com/MetacoSA/NBitcoin/blob/master/LICENSE |
+| BouncyCastle.Crypto | MIT | http://www.bouncycastle.org/csharp/licence.html|
+| log4net             | Apache 2.0 |https://logging.apache.org/log4net/license.html|
+| Multibase           | MIT | https://logging.apache.org/log4net/license.html|
+| NewtonJson          | MIT | https://github.com/JamesNK/Newtonsoft.Json/blob/master/LICENSE.md|
+
