@@ -12,8 +12,8 @@
     public class ZbdLnService
     {
         private string zebedeeUrl = null;
-        private static readonly HttpClient client = new HttpClient();
-        private static JsonSerializerSettings jsonSettings = null;
+        private HttpClient client = new HttpClient();
+        private JsonSerializerSettings jsonSettings = null;
         private IZdbLogger logger;
         public ZbdLnService(string zebedeeUrl, string zebedeeAuth)
         {
@@ -27,14 +27,14 @@
 
         }
 
-        public async Task CreateInvoiceAsync(ChargeData chargeData, Action<ChargeDetail> invoiceAction)
+        public async Task CreateInvoiceAsync(ChargeData chargeData, Action<ChargeResponse> invoiceAction)
         {
-            ChargeDetail deserializedCharge = await CreateInvoiceAsync(chargeData);
+            ChargeResponse deserializedCharge = await CreateInvoiceAsync(chargeData);
             logger.Debug("createInvoiceAsync[RES]:" + deserializedCharge.Data.Id);
             invoiceAction(deserializedCharge);
         }
 
-        public async Task<ChargeDetail> CreateInvoiceAsync(ChargeData chargeData)
+        public async Task<ChargeResponse> CreateInvoiceAsync(ChargeData chargeData)
         {
             var jsonSettings = new JsonSerializerSettings();
             jsonSettings.DateTimeZoneHandling = DateTimeZoneHandling.Local;
@@ -52,7 +52,7 @@
                 string responseBody = await response.Content.ReadAsStringAsync();
 
                 //Deserialize
-                ChargeDetail deserializedCharge = JsonConvert.DeserializeObject<ChargeDetail>(responseBody, jsonSettings);
+                ChargeResponse deserializedCharge = JsonConvert.DeserializeObject<ChargeResponse>(responseBody, jsonSettings);
                 logger.Debug("createInvoiceAsync[RES]:" + deserializedCharge.Data.Id);
                 return deserializedCharge;
 
@@ -98,14 +98,14 @@
         /// </summary>
         /// <param name="invoiceUUid"></param>
         /// <returns>A <see cref="Task{TResult}"/> representing the result of the asynchronous operation.</returns>
-        public async Task<ChargeDetail> SubscribeInvoiceAsync(string invoiceUUid, int timeoutSec = 60)
+        public async Task<ChargeResponse> SubscribeInvoiceAsync(string invoiceUUid, int timeoutSec = 60)
         {
             logger.Debug("SubscribeInvoice[REQ]:" + invoiceUUid);
             TimeSpan delay = TimeSpan.FromSeconds(1);
             TimeSpan timeout = TimeSpan.FromSeconds(Math.Min(timeoutSec, 60));//Max 60 sec
 
             Task timeoutTask = Task.Delay(timeout);
-            ChargeDetail chargeDetail = null;
+            ChargeResponse chargeDetail = null;
             // Keep retry  when satus is pending or timeoutTask is not completed
             while ( (chargeDetail == null || chargeDetail.Data.Status== "pending") &&  ! timeoutTask.IsCompleted  )
             {
@@ -121,13 +121,13 @@
             return chargeDetail;
         }
 
-        private  async Task<ChargeDetail> getChargeDetailAsync(String chargeUuid)
+        private  async Task<ChargeResponse> getChargeDetailAsync(String chargeUuid)
         {
             if (String.IsNullOrEmpty(chargeUuid))
             {
                 throw new ZedebeeException("GET Charge Detail Missing chargeUuid :" + chargeUuid);
             }
-            ChargeDetail deserializedCharge = null;
+            ChargeResponse deserializedCharge = null;
             string responseBody = null;
             string url = this.zebedeeUrl + "charges/" + chargeUuid;
             try
@@ -136,7 +136,7 @@
                 responseBody = await response.Content.ReadAsStringAsync();
                 response.EnsureSuccessStatusCode();
                 //Deserialize
-                deserializedCharge = JsonConvert.DeserializeObject<ChargeDetail>(responseBody, jsonSettings);
+                deserializedCharge = JsonConvert.DeserializeObject<ChargeResponse>(responseBody, jsonSettings);
             }
             catch (Exception e)
             {

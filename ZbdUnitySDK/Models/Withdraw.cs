@@ -1,0 +1,16 @@
+﻿namespace ZbdUnitySDK.Models
+{
+    public class Withdraw
+    {
+        public long Amount { get; set; }
+
+        public string InternalId { get; set; }
+
+        public string Name { get; set; }
+
+        public string Description { get; set; }
+
+        public int ExpiresIn { get; set; } = 300;
+
+    }
+}

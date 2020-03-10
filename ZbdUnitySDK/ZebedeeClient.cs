@@ -4,59 +4,73 @@
     using System.Threading.Tasks;
     using UnityEngine;
     using ZbdUnitySDK.Logging;
-    using ZbdUnitySDK.models;
+    using ZbdUnitySDK.Models;
     using ZbdUnitySDK.Models.Zebedee;
     using ZbdUnitySDK.Services;
     using IZdbLogger = Logging.IZdbLogger;
 
+    /// <summary>
+    /// This is the facade class for ZEBEDEE API
+    /// The Class has public methods Unity Csharp Code interacts with ZEBEDEE API server
+    /// </summary>
     public class ZebedeeClient
     {
         private ZbdLnService zbdService;
         private IZdbLogger logger;
 
+        /// <summary>
+        /// Instantiate the client object with  url with ZEBEDEE API server and API key from Developers Dashboard
+        /// </summary>
+        /// <param name="apikey">API Key from ZEBEDEE Developers Dashboard for the game</param>
+        /// <param name="baseUrl">ZEBEDEE HTTP REST API base Url e.g. https://beta-api.zebedee.io/v0/ (refer API Doc)</param>
         public ZebedeeClient(string baseUrl,string apikey)
         {
             this.zbdService = new ZbdLnService(baseUrl, apikey);
             this.logger = LoggerFactory.GetLogger();
         }
 
-        //Create Invoice asynchronously with Callback 
-        public async Task CreateInvoiceAsync(InvoiceRequest invoice, Action<ChargeDetail> invoiceAction)
+        /// <summary>
+        ///Create Invoice asynchronously with Callback function handling ChargeDetail Response
+        ///<param name="invoice">invoice reques containing amount in milli satoshi and description</param>
+        /// </summary>
+        public async Task CreateInvoiceAsync(Charge charge, Action<ChargeResponse> chargeAction)
         {
 
+            //Conver from SDK class to API class
             ChargeData chargeData = new ChargeData();
-            chargeData.Amount = invoice.MilliSatoshiAmount;
-            chargeData.Description = invoice.Description;
-            chargeData.Name = invoice.Description;
+            chargeData.Amount = charge.AmountInSatoshi * 1000;
+            chargeData.Description = charge.Description;
+            chargeData.Name = charge.Description;
 
             logger.Debug("CreateInvoice with amount:" + chargeData.Amount);
 
-            await zbdService.CreateInvoiceAsync(chargeData, charge => {
-                invoiceAction(charge);
+            await zbdService.CreateInvoiceAsync(chargeData, chargeResponse => {
+                chargeAction(chargeResponse);
             } );
 
         }
 
-        //Create Invoice asynchronously without Callback 
-        public async Task<ChargeDetail> CreateInvoiceAsync(InvoiceRequest invoice)
+        /// <summary>
+        ///Create Invoice asynchronously , returning  ChargeDetail Reponse
+        /// </summary>
+        public async Task<ChargeResponse> CreateInvoiceAsync(Charge charge)
         {
 
             ChargeData chargeData = new ChargeData();
-            chargeData.Amount = invoice.MilliSatoshiAmount;
-            chargeData.Description = invoice.Description;
-            chargeData.Name = invoice.Description;
+            chargeData.Amount = charge.AmountInSatoshi * 1000;
+            chargeData.Description = charge.Description;
+            chargeData.Name = charge.Description;
 
             logger.Debug("CreateInvoice with amount:" + chargeData.Amount);
 
-            ChargeDetail chargeDetail = await zbdService.CreateInvoiceAsync(chargeData);
+            ChargeResponse chargeDetail = await zbdService.CreateInvoiceAsync(chargeData);
             return chargeDetail;
 
         }
 
-        public async Task<string> SubscribeChargeAsync(string chargeId)
+        public async Task<string> SubscribeChargeAsync(string chargeId, int timeoutSec = 60)
         {
-
-            ChargeDetail chargeDetail =  await zbdService.SubscribeInvoiceAsync(chargeId);
+            ChargeResponse chargeDetail =  await zbdService.SubscribeInvoiceAsync(chargeId, timeoutSec);
             logger.Debug("SubscribeChargeAsync with amount:" + chargeDetail.Data.Amount);
             return chargeDetail.Data.Status;
         }
@@ -97,10 +111,10 @@
             return withdrawResponse;
         }
 
-        public async Task<string> SubscribeWithDrawAsync(string withdrawId)
+        public async Task<string> SubscribeWithDrawAsync(string withdrawId, int timeoutSec = 60)
         {
 
-            WithdrawResponse withdrawDetail = await zbdService.SubscribeWithdrawAsync(withdrawId);
+            WithdrawResponse withdrawDetail = await zbdService.SubscribeWithdrawAsync(withdrawId, timeoutSec);
             return withdrawDetail.Data.Status;
         }
 

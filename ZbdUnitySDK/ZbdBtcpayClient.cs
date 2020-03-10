@@ -10,6 +10,10 @@
     using ZbdUnitySDK.UnityUtils;
     using ZbdUnitySDK.Utils;
 
+    /// <summary>
+    /// This is the facade class for BTCPAY API
+    /// The Class has public methods Unity Csharp Code interacts with ZEBEDEE API server
+    /// </summary>
     public class ZbdBtcpayClient
     {
         private Key ecKey = null;

@@ -9,22 +9,36 @@ using ZbdUnitySDK.Services;
 
 namespace ZbdUnitySDKTest
 {
+    /// <summary>
+    /// This is Test Class for Integration test with ZEBEDEE API
+    /// it uses real developer accounts with small amount
+    /// </summary>
     public class ZebedeeLnIT    
     {
 
         private readonly ITestOutputHelper output;
+
+
+        /// If any thing is wrong, test URL and Api key from Postman 
+
         private readonly string zebedeeUrl = "https://beta-api.zebedee.io/v0/";
-        private readonly string apikey = "z56feHNrcHNBYlcsVwji0qK7TojdBBP6";
+        //developer masashi+5@zebedee.io
+        private readonly string apikey = "8NH0HhdWOcbV4YHRUESFAI3HRRSJEx2N";//DONT STEAL SATOSHIS!!
+        //user masashi+6@zebedee.io
+        private readonly string apikey2 = "PNcD3FnDLuHkN4XESMOJhAenvcumZ9Qz"; //DONT STEAL SATOSHIS!!
 
         public ZebedeeLnIT(ITestOutputHelper testOutputHelper)
         {
             this.output = testOutputHelper;
         }
 
+        /// <summary>
+        ///  Simplly Invoice generation by Charge API
+        /// </summary>
         [Fact]
         public async void InvoiceCreationTest()
         {
-            string testDesc = "CSHARP IT TEST DES for Charge ";
+            string testDesc = "CSHARP IT TEST for Charge ";
 
             //service setup
             ZbdLnService zbdLnService = new ZbdLnService(zebedeeUrl, apikey);
@@ -72,13 +86,17 @@ namespace ZbdUnitySDKTest
             cde.Reset();
         }
 
+        /// <summary>
+        /// 1st developer pays to 2nd dev  by payment API
+        /// </summary>
         [Fact]
-        public async void InvoiceCreationAndPaymentTest()
+        public async void InvoicePaymentTest()
         {
-            string testDesc = "CSHARP IT TEST DES for Charge ";
+            string testDesc = "CSHARP IT TEST for Charge ";
 
             //service setup
-            ZbdLnService zbdLnService = new ZbdLnService(zebedeeUrl, apikey );
+            ZbdLnService zbdLnService = new ZbdLnService(zebedeeUrl, apikey ); //Pay to 2nd developer
+            ZbdLnService zbdLnService2 = new ZbdLnService(zebedeeUrl, apikey2); //Generate Invoice and get paid
 
             ///////////////////////////// Create Invoice
             ChargeData chargeData = new ChargeData();
@@ -90,7 +108,7 @@ namespace ZbdUnitySDKTest
             CountdownEvent cde = new CountdownEvent(1); // initial count = 1
             String bolt = "";
             //Call the API and assert within the callback
-            Task task = zbdLnService.CreateInvoiceAsync(chargeData, charge =>
+            Task task = zbdLnService2.CreateInvoiceAsync(chargeData, charge =>
             {
                 try
                 {
@@ -123,7 +141,7 @@ namespace ZbdUnitySDKTest
             cde.Reset();
 
 
-            ///////////////////////////// PAYMENT to BOLT Invoice
+            ///////////////////////////// PAYMENT dev1 to BOLT Invoice dev2
 
             PaymentRequest paymentRequest = new PaymentRequest();
             paymentRequest.Invoice = bolt;
@@ -156,14 +174,19 @@ namespace ZbdUnitySDKTest
             }
         }
 
+        /// <summary>
+        ///  1. dev 1 generate invoice
+        ///  2. dev 1 subscribe to the invoice
+        ///  3. dev 2 pay to it
+        /// </summary>
         [Fact]
         public async void InvoiceCreationAndSubscribeToSettlement()
         {
             string testDesc = "CSHARP IT TEST DES for Charge/Settlement ";
 
             //service setup
-            ZbdLnService zbdLnService = new ZbdLnService(zebedeeUrl, apikey);
-
+            ZbdLnService zbdLnService = new ZbdLnService(zebedeeUrl, apikey); // invoice generation
+            ZbdLnService zbdLnService2 = new ZbdLnService(zebedeeUrl, apikey2); //pay to invoice
             ///////////////////////////// Create Invoice
             ChargeData chargeData = new ChargeData();
             chargeData.Name = testDesc;
@@ -212,7 +235,7 @@ namespace ZbdUnitySDKTest
             cde.Reset();
 
             ///////////////////////////// SUBSCCRIBE to BOLT Invoice
-            Task<ChargeDetail> subscribeChargeTask = zbdLnService.SubscribeInvoiceAsync(chargeId);
+            Task<ChargeResponse> subscribeChargeTask = zbdLnService.SubscribeInvoiceAsync(chargeId);
 
 
             ///////////////////////////// PAYMENT to BOLT Invoice
@@ -221,7 +244,7 @@ namespace ZbdUnitySDKTest
             paymentRequest.Description = "CSHARP TEST SELF INVOICE PAUYMENT " + DateTime.Now;
             paymentRequest.InternalId = "PAYMENT-" + DateTime.Now.ToShortTimeString();
 
-            task = zbdLnService.PayInvoiceAsync(paymentRequest, paymentResponse =>
+            task = zbdLnService2.PayInvoiceAsync(paymentRequest, paymentResponse =>
             {
                 try
                 {
@@ -247,7 +270,7 @@ namespace ZbdUnitySDKTest
             }
 
             //SUBSCRIPTION  ASSERT
-            ChargeDetail chargeResult = await subscribeChargeTask;
+            ChargeResponse chargeResult = await subscribeChargeTask;
 
             output.WriteLine("Status:" + chargeResult.Data.Status);
             Assert.Equal("completed",chargeResult.Data.Status);
@@ -256,6 +279,10 @@ namespace ZbdUnitySDKTest
 
         }
 
+        /// <summary>
+        /// Charge Invoice and subscribe but do not pay.
+        /// Expects timeout
+        /// </summary>
         [Fact]
         public async void InvoiceCreationAndTimeout()
         {
@@ -312,46 +339,14 @@ namespace ZbdUnitySDKTest
             cde.Reset();
 
             ///////////////////////////// SUBSCCRIBE to BOLT Invoice
-            Task<ChargeDetail> subscribeChargeTask = zbdLnService.SubscribeInvoiceAsync(chargeId);
-
-
-            /////////////////////////////// PAYMENT to BOLT Invoice 
-            //PaymentRequest paymentRequest = new PaymentRequest();
-            //paymentRequest.Invoice = bolt;
-            //paymentRequest.Description = "CSHARP TEST SELF INVOICE PAUYMENT " + DateTime.Now;
-            //paymentRequest.InternalId = "PAYMENT-" + DateTime.Now.ToShortTimeString();
-
-            //task = zbdLnService.payInvoiceAsync(paymentRequest, paymentResponse =>
-            //{
-            //    try
-            //    {
-            //        Assert.NotNull(paymentResponse.Message);
-            //        Assert.NotNull(paymentResponse.Data);
-            //        Assert.NotNull(paymentResponse.Data.Id);
-            //        Assert.Equal("success", paymentResponse.Data.Status);
-            //        Assert.Equal(testDesc, paymentResponse.Data.Description);
-            //        output.WriteLine("Message " + paymentResponse.Message);
-            //        output.WriteLine("desc " + paymentResponse.Data.Description);
-            //    }
-            //    finally
-            //    {
-            //        cde.Signal();
-            //    }
-            //});
-
-            ////Latch wait
-            //cde.Wait(5000);
-            //if (cde.CurrentCount != 0)
-            //{
-            //    Assert.True(false, "payment call timeout ");
-            //}
+            Task<ChargeResponse> subscribeChargeTask = zbdLnService.SubscribeInvoiceAsync(chargeId);
 
             //SUBSCRIPTION  ASSERT
 
             try
             {
-                ChargeDetail chargeResult = await subscribeChargeTask;
-                Assert.True(false, "Timeout Exception should be thrown ");
+                ChargeResponse chargeResult = await subscribeChargeTask;
+                Assert.True(false, "Timeout Exception should be thrown ");// should not reach this line
 
             }
             catch (ZedebeeException e) {
@@ -359,12 +354,19 @@ namespace ZbdUnitySDKTest
                 output.WriteLine("Expected Exception is thrown:" + e.Message);
             }
         }
-        //WithdrawAsync
+
+
+
+
+        /// 
+        /// <summary>
+        /// Create a simple Withdraw
+        /// </summary>
         [Fact]
         public async void WithdrawalTest()
         {
             string testDesc = "CSHARP IT TEST for withdrawal";
-            int testAmount = 1000;
+            int testAmount = 10000;//Default 10 satoshi
 
             //service setup
             ZbdLnService zbdLnService = new ZbdLnService(zebedeeUrl, apikey);
@@ -410,7 +412,7 @@ namespace ZbdUnitySDKTest
         public async void SubscribeToWithdrawalAndCompleteTest()
         {
             string testDesc = "CSHARP IT TEST for subscribe to Withdrawal";
-            int testAmount = 1000;
+            int testAmount = 10000;//default 10 sats
 
             //service setup
             ZbdLnService zbdLnService = new ZbdLnService(zebedeeUrl, apikey);
@@ -452,7 +454,7 @@ namespace ZbdUnitySDKTest
             cde.Wait(5000);
             if (cde.CurrentCount != 0)
             {
-                Assert.True(false, "charge call timeout ");
+                Assert.True(false, "withdraw call timeout ");
             }
 
             output.WriteLine("outside lnurl:" + lnurl);
@@ -462,10 +464,9 @@ namespace ZbdUnitySDKTest
 
             /////////////////////////////// SUBSCCRIBE to Withdrawal
             Task<WithdrawResponse> subscribeWithdrawTask = zbdLnService.SubscribeWithdrawAsync(withdrawId);
-
-            /////////////////////////////// HERE WITHDRAW by WALLET  manually by capturing LNURL in debug mode
-
-
+            ///////////////////////////////  1. PUT BREAK POINT on ABOVE LINE and find the value of variable lnurl
+            //////////////////////////////// 2. Go to the QR COde sie and scan by ZEBEDEE wallet (or any LNURL supporting wallet)
+            //////////////////////////////// https://www.the-qrcode-generator.com/
 
             //SUBSCRIPTION  ASSERT
             WithdrawResponse withdrawResult = await subscribeWithdrawTask;

@@ -10,13 +10,13 @@ using ZbdUnitySDK.Services;
 
 namespace ZbdUnitySDKTest
 {
-    public class ZebedeeLnTest
+    public class ZebedeeStubTest
     {
 
         private readonly ITestOutputHelper output;
         private readonly string zebedeeStubHost = "http://localhost";
         private readonly string apikey = "DUMMY-APIKEY";
-        public ZebedeeLnTest(ITestOutputHelper testOutputHelper)
+        public ZebedeeStubTest(ITestOutputHelper testOutputHelper)
         {
             this.output = testOutputHelper;
         }

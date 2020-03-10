@@ -104,6 +104,22 @@ This repository also contains a Sample Unity project under `/<Project Folder>/Un
 ![Unity Demo project](README_img/zbdSDK_unity.png)
 
 
+# Project Structure
+1. ZbdUnitySDK Main Project
+   1. Exception  API Implementation Specific Exception
+   2. Logging which supports both Unity Runtime and non-Unity(Console) Runtime
+   3. Models Common Classes and API Speicic Request/Response Classes
+   4. Services  API Implementation Specific Service classes
+   5. Unity Unity specific class , Coroutine returning Data
+   6. Utils  Common Utility classes , Encryption ,File access ,Unity Asset Access
+   7. ZbdBtcpayClient  Facade client class to use BTCPay server's API(In Development)
+   8. ZebedeeClient  Facade client class to use Zebedee API
+2. ZbdUnitySDKIntegrationTest  Integration Tests with main ZEBEDEE API server (Most Important Test)
+3. ZbdUnitySDKTests Unit tests
+4. ZebedeeSDKRun    To test Logging by running on Console
+   
+![Project Structure](README_img/Project_Structure.png)
+
 # Acknowledgement
 This SDK depends on several opensource projects below.
 
