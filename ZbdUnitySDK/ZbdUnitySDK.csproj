@@ -12,6 +12,7 @@
     <Product>Zebedee Unity SDK</Product>
     <Description>Unity SDK for Linghing Network</Description>
     <Copyright>Zebedee Inc.</Copyright>
+    <Version>1.1.0</Version>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
