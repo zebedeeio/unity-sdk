@@ -1,7 +1,6 @@
 ﻿namespace ZbdUnitySDK.Logging
 {
     using System;
-    using Xunit.Abstractions;
 
     public class LoggerFactory
     {
@@ -30,11 +29,6 @@
                     break;
             }
 
-            return logger;
-        }
-        public static IZdbLogger GetLogger(ITestOutputHelper testOutputHelper)
-        {
-            logger = new XUnitLogger(testOutputHelper);
             return logger;
         }
 

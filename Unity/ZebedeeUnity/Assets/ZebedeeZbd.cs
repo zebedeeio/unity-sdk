@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using ZbdUnitySDK;
 using ZbdUnitySDK.Logging;
-using ZbdUnitySDK.models;
+using ZbdUnitySDK.Models;
 using ZbdUnitySDK.Models.Zebedee;
 using ZXing;
 using ZXing.QrCode;
@@ -31,19 +31,19 @@ public class ZebedeeZbd : MonoBehaviour
     {
         //1.New Invoice Preparation
         //1.インボイス オブジェクトに必要項目をセットする
-        InvoiceRequest invoiceReq = new InvoiceRequest();
+        Charge invoiceReq = new Charge();
         invoiceReq.Description = product.text;
-        invoiceReq.MilliSatoshiAmount = int.Parse(amount.text) * 1000;
+        invoiceReq.AmountInSatoshi = int.Parse(amount.text);
 
         logger.Debug("CreateInvoice:"+invoiceReq.Description);
 
         //2.Create Invoice with initial data and get the full invoice
         //2.Zebedee Serverにインボイスデータをサブミットして、インボイスの詳細データを取得する。
-        await zbdClient.CreateInvoiceAsync(invoiceReq, handleInvoice);
+        await zbdClient.CreateChargeAsync(invoiceReq, handleInvoice);
 
     }
 
-    private async void handleInvoice(ChargeDetail invoice)
+    private async void handleInvoice(ChargeResponse invoice)
     {
         //3.Lightning BOLT invoice string
         string boltInvoice = invoice.Data.Invoice.Request;
@@ -85,10 +85,9 @@ public class ZebedeeZbd : MonoBehaviour
     {
         //1.New Invoice Preparation
         //1.インボイス オブジェクトに必要項目をセットする
-        WithdrawRequest withdrawReq = new WithdrawRequest();
+        Withdraw withdrawReq = new Withdraw();
         withdrawReq.Description = product.text;
-        withdrawReq.Amount = int.Parse(amount.text);
-        withdrawReq.InternalId = product.text;
+        withdrawReq.AmountInSatoshi = int.Parse(amount.text);
 
         //2.Create Invoice with initial data and get the full invoice
         //2.Zebedee Serverにインボイスデータをサブミットして、インボイスの詳細データを取得する。

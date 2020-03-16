@@ -1,15 +1,10 @@
 ﻿namespace ZbdUnitySDK.Logging
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Text;
-
     public enum LogType
     {
         CONSOLE,
         LOG4NET,
         UNITY_DEBUG,
-        XUNIT,    
     }
 
     public interface IZdbLogger
