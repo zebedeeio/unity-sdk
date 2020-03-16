@@ -2,7 +2,6 @@
 {
     using System;
     using System.Threading.Tasks;
-    using UnityEngine;
     using ZbdUnitySDK.Logging;
     using ZbdUnitySDK.Models;
     using ZbdUnitySDK.Models.Zebedee;
@@ -33,7 +32,7 @@
         ///Create Invoice asynchronously with Callback function handling ChargeDetail Response
         ///<param name="invoice">invoice reques containing amount in milli satoshi and description</param>
         /// </summary>
-        public async Task CreateInvoiceAsync(Charge charge, Action<ChargeResponse> chargeAction)
+        public async Task CreateChargeAsync(Charge charge, Action<ChargeResponse> chargeAction)
         {
 
             //Conver from SDK class to API class
@@ -44,7 +43,7 @@
 
             logger.Debug("CreateInvoice with amount:" + chargeData.Amount);
 
-            await zbdService.CreateInvoiceAsync(chargeData, chargeResponse => {
+            await zbdService.CreateChargeAsync(chargeData, chargeResponse => {
                 chargeAction(chargeResponse);
             } );
 
@@ -63,7 +62,7 @@
 
             logger.Debug("CreateInvoice with amount:" + chargeData.Amount);
 
-            ChargeResponse chargeDetail = await zbdService.CreateInvoiceAsync(chargeData);
+            ChargeResponse chargeDetail = await zbdService.CreateChargeAsync(chargeData);
             return chargeDetail;
 
         }
@@ -82,17 +81,21 @@
             paymentRequest.Invoice = bolt11;
 
             await zbdService.PayInvoiceAsync(paymentRequest, paymentResponse => {
-                Debug.Log(paymentResponse.Data.Status);
+                logger.Debug(paymentResponse.Data.Status);
             });
 
         }
 
         //Withdraw with Callback
-        public async Task WithDrawAsync(WithdrawRequest withdrawRequest, Action<WithdrawResponse> action)
+        public async Task WithDrawAsync(Withdraw withdraw, Action<WithdrawResponse> action)
         {
 
             //Satoshi to milli satoshi
-            withdrawRequest.Amount = withdrawRequest.Amount * 1000;
+            WithdrawData withdrawRequest = new WithdrawData();
+            withdrawRequest.Amount = withdraw.AmountInSatoshi * 1000;
+            withdrawRequest.Name = withdraw.Name;
+            withdrawRequest.Description = withdraw.Description;
+
 
             await zbdService.WithdrawAsync(withdrawRequest, paymentResponse => {
                 action(paymentResponse);
@@ -101,11 +104,14 @@
         }
 
         //Withdraw without Callback
-        public async Task<WithdrawResponse> WithDrawAsync(WithdrawRequest withdrawRequest)
+        public async Task<WithdrawResponse> WithDrawAsync(Withdraw withdraw)
         {
 
             //Satoshi to milli satoshi
-            withdrawRequest.Amount = withdrawRequest.Amount * 1000;
+            WithdrawData withdrawRequest = new WithdrawData();
+            withdrawRequest.Amount = withdraw.AmountInSatoshi * 1000;
+            withdrawRequest.Name = withdraw.Name;
+            withdrawRequest.Description = withdraw.Description;
 
             WithdrawResponse withdrawResponse = await zbdService.WithdrawAsync(withdrawRequest);
             return withdrawResponse;

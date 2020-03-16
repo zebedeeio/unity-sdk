@@ -9,7 +9,7 @@
         CONSOLE,
         LOG4NET,
         UNITY_DEBUG,
-//        XUNIT,    //XUNIT DOESNOT ALLOW LOGGING
+        XUNIT,    
     }
 
     public interface IZdbLogger

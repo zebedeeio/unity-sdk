@@ -2,7 +2,7 @@
 {
     public class Withdraw
     {
-        public long Amount { get; set; }
+        public long AmountInSatoshi { get; set; }
 
         public string InternalId { get; set; }
 

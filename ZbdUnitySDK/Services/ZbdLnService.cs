@@ -27,20 +27,20 @@
 
         }
 
-        public async Task CreateInvoiceAsync(ChargeData chargeData, Action<ChargeResponse> invoiceAction)
+        public async Task CreateChargeAsync(ChargeData chargeData, Action<ChargeResponse> chargeAction)
         {
-            ChargeResponse deserializedCharge = await CreateInvoiceAsync(chargeData);
-            logger.Debug("createInvoiceAsync[RES]:" + deserializedCharge.Data.Id);
-            invoiceAction(deserializedCharge);
+            ChargeResponse deserializedCharge = await CreateChargeAsync(chargeData);
+            logger.Debug("CreateChargeAsync[RES]:" + deserializedCharge.Data.Id);
+            chargeAction(deserializedCharge);
         }
 
-        public async Task<ChargeResponse> CreateInvoiceAsync(ChargeData chargeData)
+        public async Task<ChargeResponse> CreateChargeAsync(ChargeData chargeData)
         {
             var jsonSettings = new JsonSerializerSettings();
             jsonSettings.DateTimeZoneHandling = DateTimeZoneHandling.Local;
             jsonSettings.NullValueHandling = NullValueHandling.Ignore;
 
-            logger.Debug("createInvoiceAsync [REQ]:" + chargeData.Description);
+            logger.Debug("CreateChargeAsync [REQ]:" + chargeData.Description);
 
             try
             {
@@ -65,7 +65,7 @@
 
         }
 
-        public async Task PayInvoiceAsync(PaymentRequest paymentRequest, Action<PaymentResponse> paymentction)
+        public async Task PayInvoiceAsync(PaymentRequest paymentRequest, Action<PaymentResponse> paymentAction)
         {
             try
             {
@@ -80,7 +80,7 @@
                 PaymentResponse deserializedPayment = JsonConvert.DeserializeObject<PaymentResponse>(responseBody, jsonSettings);
                 logger.Debug("payInvoiceAsync[RES]:" + deserializedPayment.Data.Id);
 
-                paymentction(deserializedPayment);
+                paymentAction(deserializedPayment);
 
             }
             catch (Exception e)
@@ -147,23 +147,24 @@
         }
 
 
-        public async Task WithdrawAsync(WithdrawRequest withdrawRequest, Action<WithdrawResponse> withdrawAction)
+        public async Task WithdrawAsync(WithdrawData withdrawData, Action<WithdrawResponse> withdrawAction)
         {
             //Deserialize
-            WithdrawResponse deserializedCharge = await WithdrawAsync(withdrawRequest);
+            WithdrawResponse deserializedCharge = await WithdrawAsync(withdrawData);
 
             withdrawAction(deserializedCharge);
 
         }
 
-        public async Task<WithdrawResponse> WithdrawAsync(WithdrawRequest withdrawRequest)
+        public async Task<WithdrawResponse> WithdrawAsync(WithdrawData withdrawData)
         {
+            HttpResponseMessage response = null;
             try
             {
-                logger.Debug("WithdrawAsync:" + withdrawRequest.Description);
-                string json = JsonConvert.SerializeObject(withdrawRequest, jsonSettings);
+                logger.Debug("WithdrawAsync:" + withdrawData.Description);
+                string json = JsonConvert.SerializeObject(withdrawData, jsonSettings);
                 StringContent httpContent = new StringContent(json, Encoding.UTF8, "application/json");
-                HttpResponseMessage response = await client.PostAsync(this.zebedeeUrl + "withdrawal-requests", httpContent);
+                response = await client.PostAsync(this.zebedeeUrl + "withdrawal-requests", httpContent);
                 response.EnsureSuccessStatusCode();
                 string responseBody = await response.Content.ReadAsStringAsync();
 
@@ -175,6 +176,7 @@
             catch (Exception e)
             {
                 logger.Error(string.Format("WithdrawAsync with Exception : {0}", e));
+                logger.Error(response.ToString());
                 throw e;
             }
 

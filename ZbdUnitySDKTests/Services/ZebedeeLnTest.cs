@@ -16,6 +16,7 @@ namespace ZbdUnitySDKTest
         private readonly ITestOutputHelper output;
         private readonly string zebedeeStubHost = "http://localhost";
         private readonly string apikey = "DUMMY-APIKEY";
+        
         public ZebedeeStubTest(ITestOutputHelper testOutputHelper)
         {
             this.output = testOutputHelper;
@@ -69,7 +70,7 @@ namespace ZbdUnitySDKTest
             CountdownEvent cde = new CountdownEvent(1); // initial count = 1
             String bolt = "";
             //Call the API 
-            Task task = zbdLnService.CreateInvoiceAsync(chargeData, charge =>
+            Task task = zbdLnService.CreateChargeAsync(chargeData, charge =>
             {
                 try
                 {

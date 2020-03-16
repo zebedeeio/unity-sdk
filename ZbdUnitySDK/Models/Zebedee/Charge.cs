@@ -4,23 +4,6 @@ using System;
 namespace ZbdUnitySDK.Models.Zebedee
 {
 
-
-    public class ChargeRequest
-    {
-        //in milli satoshi
-        [JsonProperty(PropertyName = "amount")]
-        public long Amount { get; set; }
-
-        [JsonProperty(PropertyName = "internalId")]
-        public string InternalId { get; set; }
-
-        [JsonProperty(PropertyName = "name")]
-        public string Name { get; set; }
-
-        [JsonProperty(PropertyName = "description")]
-        public string Description { get; set; }
-    }
-
     /// <summary>
     ///  ZEBEDEE Charge API Reponse
     /// </summary>
