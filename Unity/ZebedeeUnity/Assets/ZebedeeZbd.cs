@@ -29,17 +29,15 @@ public class ZebedeeZbd : MonoBehaviour
 
     public async void CreateInvoice()
     {
-        //1.New Invoice Preparation
-        //1.インボイス オブジェクトに必要項目をセットする
-        Charge invoiceReq = new Charge();
-        invoiceReq.Description = product.text;
-        invoiceReq.AmountInSatoshi = int.Parse(amount.text);
+        //1.New Charge Preparation
+        Charge charge = new Charge();
+        charge.Description = product.text;
+        charge.AmountInSatoshi = int.Parse(amount.text);
 
-        logger.Debug("CreateInvoice:"+invoiceReq.Description);
+        logger.Debug("CreateInvoice:"+charge.Description);
 
-        //2.Create Invoice with initial data and get the full invoice
-        //2.Zebedee Serverにインボイスデータをサブミットして、インボイスの詳細データを取得する。
-        await zbdClient.CreateChargeAsync(invoiceReq, handleInvoice);
+        //2.Create Charge object and get the BOLT11 invoice from ZEBEDEE API
+        await zbdClient.CreateChargeAsync(charge, handleInvoice);
 
     }
 
@@ -56,19 +54,14 @@ public class ZebedeeZbd : MonoBehaviour
 
         Texture2D texs = GenerateQR(boltInvoice);//Generate QR code image
 
-        //4.Set the QR code iamge to image Gameobject
-        //4.取得したBOLTからQRコードを作成し、ウオレットでスキャンするために表示する。
+        //4.Set the QR code Image to image Gameobject
         QRcodeBOLT11.GetComponent<Image>().sprite = Sprite.Create(texs, new Rect(0.0f, 0.0f, texs.width, texs.height), new Vector2(0.5f, 0.5f), 100.0f);
 
-        //5.Subscribe the an callback method with invoice ID to be monitored
-        //5.支払がされたら実行されるコールバックを引き渡して、コールーチンで実行する
-        //        StartCoroutine(btcPayClient.SubscribeInvoiceCoroutine(invoice.Id, printInvoice));
-        //StartCoroutine(btcPayClient.listenInvoice(invoice.Id, printInvoice));
+        //5.Subscribe the get notified about payment status
         string status = await zbdClient.SubscribeChargeAsync(chargeId);
 
         if ("completed".Equals(status))
         {
-            //インボイスのステータスがcompleteであれば、全額が支払われた状態なので、支払完了のイメージに変更する
             //Change the image from QR to Paid
             QRcodeBOLT11.GetComponent<Image>().sprite = Resources.Load<Sprite>("image/paid");
             logger.Debug("payment is complete");
@@ -76,22 +69,19 @@ public class ZebedeeZbd : MonoBehaviour
         else
         {
             //for example, if the amount paid is not full, do something.the line below just print the status.
-            //全額支払いでない場合には、なにか処理をおこなう。以下は、ただ　ステータスを表示して終了。
             logger.Error("payment is not completed:" +status);
         }
     }
 
     public async void CreateWithdrawal()
     {
-        //1.New Invoice Preparation
-        //1.インボイス オブジェクトに必要項目をセットする
-        Withdraw withdrawReq = new Withdraw();
-        withdrawReq.Description = product.text;
-        withdrawReq.AmountInSatoshi = int.Parse(amount.text);
+        //1.New Withdraw Preparation
+        Withdraw withdraw = new Withdraw();
+        withdraw.Description = product.text;
+        withdraw.AmountInSatoshi = int.Parse(amount.text);
 
-        //2.Create Invoice with initial data and get the full invoice
-        //2.Zebedee Serverにインボイスデータをサブミットして、インボイスの詳細データを取得する。
-        await zbdClient.WithDrawAsync(withdrawReq, handleWithdrawal);
+        //2.Create withdraw with ZEBEDEE backend and get lnurl
+        await zbdClient.WithDrawAsync(withdraw, handleWithdrawal);
 
     }
 
@@ -107,19 +97,14 @@ public class ZebedeeZbd : MonoBehaviour
 
         Texture2D texs = GenerateQR(lnURL);//Generate QR code image
 
-        //4.Set the QR code iamge to image Gameobject
-        //4.取得したBOLTからQRコードを作成し、ウオレットでスキャンするために表示する。
+        //4.Set the QR code image to image Gameobject
         QRcodeLnURL.GetComponent<Image>().sprite = Sprite.Create(texs, new Rect(0.0f, 0.0f, texs.width, texs.height), new Vector2(0.5f, 0.5f), 100.0f);
 
         //5.Subscribe the an callback method with invoice ID to be monitored
-        //5.支払がされたら実行されるコールバックを引き渡して、コールーチンで実行する
-        //        StartCoroutine(btcPayClient.SubscribeInvoiceCoroutine(invoice.Id, printInvoice));
-        //StartCoroutine(btcPayClient.listenInvoice(invoice.Id, printInvoice));
         string status = await zbdClient.SubscribeWithDrawAsync(withdraw.Data.Id);
 
         if ("completed".Equals(status))
         {
-            //インボイスのステータスがcompleteであれば、全額が支払われた状態なので、支払完了のイメージに変更する
             //Change the image from QR to Paid
             QRcodeLnURL.GetComponent<Image>().sprite = Resources.Load<Sprite>("image/withdrawn");
             logger.Debug("withdraw is success");
@@ -127,7 +112,6 @@ public class ZebedeeZbd : MonoBehaviour
         else
         {
             //for example, if the amount paid is not full, do something.the line below just print the status.
-            //全額支払いでない場合には、なにか処理をおこなう。以下は、ただ　ステータスを表示して終了。
             logger.Error("withdraw is not success:" + status);
         }
 
