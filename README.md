@@ -1,5 +1,7 @@
 # ZEBEDEE Unity SDK
 
+### Caveat: The SDK will not currently work with webGL, an update will be released soon, however in the mean time you can use the REST API found at https://documentation.zebedee.io/ along side the standard UnityWebRequest library 
+
 The ZEBEDEE Unity SDK allows developers to easily integrate Bitcoin Lightning microtransactions into their games and digital experiences. The SDK aims to provide helper methods to improve upon developer experience. The following backend systems are available for the Unity SDK:
 
 1. [ZEBEDEE Lightning API](https://zebedee.io)
