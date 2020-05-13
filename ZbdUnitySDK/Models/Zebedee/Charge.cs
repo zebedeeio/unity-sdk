@@ -6,7 +6,8 @@ namespace ZbdUnitySDK.Models.Zebedee
 
     /// <summary>
     ///  ZEBEDEE Charge API Reponse
-    /// </summary>
+    /// </summary> 
+
     public class ChargeResponse
     {
 
@@ -20,6 +21,14 @@ namespace ZbdUnitySDK.Models.Zebedee
         }
     }
 
+    public class ChargeDataJSON
+    {
+        public string name;
+        public string description;
+        public long amount;
+        public string internalId;
+        public long expiresIn;
+    }
     /// <summary>
     ///  ZEBEDEE Charge API Request 
     /// </summary>
@@ -40,23 +49,45 @@ namespace ZbdUnitySDK.Models.Zebedee
         public DateTime CreatedAt { get; set; }
 
         public string CallbackUrl { get; set; }
+         
         public string InternalId { get; set; }
+
         [JsonProperty(PropertyName = "amount")]
         public long Amount { get; set; }
+
+        public int ExpiresIn { get; set; }
+
         public string Status { get; set; }
+
+        public DateTime ExpiresAt { get; set; }
 
         public Invoice Invoice { get; set; }
 
         public override string ToString()
         {
-            return "ChargeData: " + Name + " " + Description + " " + Amount + " "+ Status;
+            return "ChargeData: " + Name + " " + Description + " " + Amount + " " + Status;
+        }
+
+
+
+        public ChargeDataJSON toJSONFriendly()
+        {
+            ChargeDataJSON chargeDataJSON = new ChargeDataJSON();
+            chargeDataJSON.name = this.Name;
+            chargeDataJSON.description = this.Description;
+            chargeDataJSON.amount = this.Amount;
+            chargeDataJSON.internalId = this.InternalId;
+            chargeDataJSON.expiresIn = this.ExpiresIn;
+            return chargeDataJSON;
         }
 
     }
 
     public class Invoice
     {
-        public DateTime ExpiresAt { get; set; }
         public string Request { get; set; }
+        public string URI { get; set; }
     }
+
+ 
 }

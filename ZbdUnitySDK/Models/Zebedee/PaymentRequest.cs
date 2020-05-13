@@ -5,6 +5,13 @@
     using System.Text;
     using Newtonsoft.Json;
 
+    public class PaymentRequestJSON
+    {
+        public string invoice;
+        public string internalId;
+        public string description;
+    }
+
     public class PaymentRequest
     {
 
@@ -16,6 +23,17 @@
 
         [JsonProperty(PropertyName = "description")]
         public string Description { get; set; }
+
+        public PaymentRequestJSON toJSONFriendly()
+        {
+            PaymentRequestJSON paymentRequestJSON = new PaymentRequestJSON();
+
+            paymentRequestJSON.invoice = this.Invoice;
+            paymentRequestJSON.internalId = this.InternalId;
+            paymentRequestJSON.description = this.Description;
+
+            return paymentRequestJSON;
+        }
 
 
     }

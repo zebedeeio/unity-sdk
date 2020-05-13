@@ -11,7 +11,7 @@
 
         public string Description { get; set; }
 
-        public string ExpiresInSec { get; set; }
+        public int ExpiresInSec { get; set; }
 
     }
 }

@@ -10,7 +10,7 @@
 
         public string Description { get; set; }
 
-        public int ExpiresIn { get; set; } = 300;
+        public int ExpiresInSec { get; set; } = 300;
 
     }
 }
