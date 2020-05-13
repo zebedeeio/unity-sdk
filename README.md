@@ -87,6 +87,9 @@ string status = await zbdClient.SubscribeWithDrawAsync(withdraw.Data.Id);
 ## Payment Method
 In case the Player's wallet does not support LNURL QR codes, you may pay an invoice directly. Game developers can possibly implement an input for user to paste an invoice, or even a webcam feature to scan the Invoice QR code on the Player's phone.
 
+## WebGL
+The async methods above do not work correctly in webgl builds due the limitations of browser based applications. You can instead use the Coroutine versions of each call, to check out their usage you can see the ZebedeeSceneCoroutine for usage.
+
 # Examples / Demo Implementation
 This repository also contains a Sample Unity project under `/<Project Folder>/Unity/ZebedeeUnity/`. To run the project, follow the steps below:
 

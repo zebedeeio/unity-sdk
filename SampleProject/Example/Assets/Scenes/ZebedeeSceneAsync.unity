@@ -432,13 +432,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a2d8761ac2b0f3e4e806dd5f9c5e8fc0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  apiKey: ysHxXfq9iwaj23kcDlL0XeZOYr23Jq0N
+  apiKey: 
   zebedeeBaseUrl: https://beta-api.zebedee.io/v0/
   product: {fileID: 2096148998}
   amount: {fileID: 629152070}
   walletBalance: {fileID: 1874338853}
   QRcodeBOLT11: {fileID: 1182835226}
-  QRcodeLnURL: {fileID: 1182835226}
 --- !u!4 &288372993
 Transform:
   m_ObjectHideFlags: 0
